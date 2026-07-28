@@ -1,0 +1,64 @@
+
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
+.flex-center{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container{
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #353535;
+  color: #fff;
+}
+
+.mainmenu{
+  border-radius: 10px;
+  height: 500px;
+  width: 500px;
+  background-color: #1f1f1f;
+  color: #000;
+  text-align: center;
+  cursor: pointer;
+}
+
+
+
+
+
+
+
+/* BUTTON STYLLE */
+button{
+  border: none;
+  outline: none;
+  padding: 10px 20px;
+  background-color: #93fa9b;
+  color: #000;
+  cursor: pointer;
+  border-radius: 5px;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+  transition: background-color 80ms ease-in-out;
+}
+
+button:hover{
+  background-color: #57a35d;
+  color: #fff;
+}
+
+button:active{
+  background-color: #57a35d;
+  color: #fff;
+  transform: scale(0.90);
+}
