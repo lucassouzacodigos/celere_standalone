@@ -19,7 +19,7 @@ if (process.contextIsolated) {
   window.electron = {
     openLoginPage: () => ipcRenderer.send('open-login-page'),
     consoleLogCookies: () => ipcRenderer.send('console-log-cookies'),
-
+    dadosLogin: () => ipcRenderer.invoke('dados-login'),
 
   }
   window.api = api

@@ -56,8 +56,16 @@ app.whenReady().then(async () => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC FUNCOES   ---------------------------------------------------------------------------------------------------------------------------------
+  // IPC MAIN WINDOW FUNCOES   ---------------------------------------------------------------------------------------------------------------------------------
   ipcMain.on('ping', () => console.log('pong'))
+  ipcMain.handle('dados-login', () => {
+    return dadoslogin
+  })
+
+
+
+
+
 
   // Abre a janela de login e vai pra celere
   ipcMain.on('open-login-page', () => {
@@ -92,13 +100,24 @@ app.whenReady().then(async () => {
       if (url.includes("/pep") || url.includes("artes/adm")) {
         
         console.log("fechou")
-        setTimeout(() => {
-          loginWindow.close()
-        }, 500)
-        console.log(dadoslogin)
+        setTimeout(async () => {
+          const textos = await loginWindow.webContents.executeJavaScript(`
+              [...document.querySelectorAll('.greeting-text')]
+                  .map(el => el.textContent.trim());
+          `);
+          dadoslogin = textos
+          console.log(dadoslogin)
+
+          setTimeout(() => {
+            loginWindow.close()
+          }, 100)
+        }, 1000)
       }
     })
+
+    
   })
+
 
   //PRINT COOKIES
   ipcMain.on('console-log-cookies', async () => {
