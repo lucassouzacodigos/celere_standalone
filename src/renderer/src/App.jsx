@@ -11,6 +11,10 @@ function App() {
     window.electron.openLoginPage()
   }
 
+  const consoleLogCookies = () => {
+    window.electron.consoleLogCookies()
+  }
+
 
 
 
@@ -21,6 +25,7 @@ function App() {
       <div className="mainmenu flex-center">
 
         <button onClick={openLoginPage}>Login</button>
+        <button onClick={consoleLogCookies}>Cookies</button>
       
       </div>
     </div>

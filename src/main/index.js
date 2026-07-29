@@ -1,9 +1,9 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, session } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
-const saude_session = "persist:saude-session"
+let dadoslogin
 
 function createWindow() {
   // Create the browser window.
@@ -14,7 +14,7 @@ function createWindow() {
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
-      partition: saude_session,
+      partition: "persist:saude-session",
       contextIsolation: false,
       nodeIntegration: true,
       preload: join(__dirname, '../preload/index.js'),
@@ -41,7 +41,11 @@ function createWindow() {
 }
 
 //WHENR READY ---------------------------------------------
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+  const ses = session.fromPartition("persist:saude-session");
+  //limpa cache
+  await ses.clearStorageData();
+  await ses.clearCache();
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
 
@@ -66,22 +70,42 @@ app.whenReady().then(() => {
       
       ...(process.platform === 'linux' ? { icon } : {}),
       webPreferences: {
-        partition: saude_session,
+        partition: "persist:saude-session",
         contextIsolation: false,
         nodeIntegration: true,
         preload: join(__dirname, '../preload/index.js'),
         sandbox: false
       }
     })
+
     loginWindow.loadURL("https://sistema.saudepublica.digital/celere.embudasartes")
 
-    loginWindow.webContents.on("did-navigate", (event, url) => {
-    console.log(url)
-      if (url.startsWith("https://sistema.saudepublica.digital/celere.embudasartes/pep") || url.startsWith("https://sistema.saudepublica.digital/celere.embudasartes/adm")) {
+    loginWindow.webContents.on("did-navigate", async (event, url) => {
+      console.log(url)
+      const cookies = await session
+      .fromPartition("persist:saude-session")
+      .cookies.get({})
+      console.log(cookies)
+
+      
+      
+      if (url.includes("/pep") || url.includes("artes/adm")) {
+        
         console.log("fechou")
-        loginWindow.close()
+        setTimeout(() => {
+          loginWindow.close()
+        }, 500)
+        console.log(dadoslogin)
       }
     })
+  })
+
+  //PRINT COOKIES
+  ipcMain.on('console-log-cookies', async () => {
+    const cookies = await session
+    .fromPartition("persist:saude-session")
+    .cookies.get({})
+    console.log(cookies)
   })
 
 

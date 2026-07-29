@@ -17,7 +17,9 @@ if (process.contextIsolated) {
 } else {
   //mediador de funcoes
   window.electron = {
-    openLoginPage: () => ipcRenderer.send('open-login-page')
+    openLoginPage: () => ipcRenderer.send('open-login-page'),
+    consoleLogCookies: () => ipcRenderer.send('console-log-cookies'),
+
 
   }
   window.api = api
