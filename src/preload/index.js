@@ -19,7 +19,9 @@ if (process.contextIsolated) {
   window.electron = {
     openLoginPage: () => ipcRenderer.send('open-login-page'),
     consoleLogCookies: () => ipcRenderer.send('console-log-cookies'),
+    getFastMedicSession: () => ipcRenderer.invoke('get-fast-medic-session'),
     dadosLogin: () => ipcRenderer.invoke('dados-login'),
+    buscarProfissional: (dados) => ipcRenderer.invoke('buscar-profissional', dados),
 
   }
   window.api = api
