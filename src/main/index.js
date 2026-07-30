@@ -2,6 +2,7 @@ import { app, shell, BrowserWindow, ipcMain, session } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import {buscarProfissional} from './scripts/buscarProfissionais'
 
 let dadoslogin
 
@@ -57,7 +58,7 @@ app.whenReady().then(async () => {
   })
 
   // IPC MAIN WINDOW FUNCOES   ---------------------------------------------------------------------------------------------------------------------------------
-  ipcMain.on('ping', () => console.log('pong'))
+  ipcMain.on('ping', () => console.log('png'))
   ipcMain.handle('dados-login', () => {
     return dadoslogin
   })
@@ -87,6 +88,16 @@ app.whenReady().then(async () => {
     })
 
     loginWindow.loadURL("https://sistema.saudepublica.digital/celere.embudasartes")
+
+    loginWindow.webContents.on("did-finish-load", () => {
+      loginWindow.webContents.executeJavaScript(`
+          document.querySelector("#inputUsuario").value = " [REDACTED]"
+        `)
+
+      loginWindow.webContents.executeJavaScript(`
+          document.querySelector("#inputSenha").value = " [REDACTED]"
+        `)
+    })
 
     loginWindow.webContents.on("did-navigate", async (event, url) => {
       console.log(url)
@@ -125,6 +136,22 @@ app.whenReady().then(async () => {
     .fromPartition("persist:saude-session")
     .cookies.get({})
     console.log(cookies)
+  })
+
+  //BUSCA PROFISSIONAL
+  ipcMain.handle('buscar-profissional', async (event, dados) => {
+    const response = await buscarProfissional(dados)
+    console.log(response)
+    return response
+  })
+
+  //get fast medic session
+  ipcMain.handle('get-fast-medic-session', async () => {
+    const ses = session.fromPartition("persist:saude-session");
+    const [cookie] = await ses.cookies.get({name: "FAST_SessionId"})
+
+    console.log(cookie?.value)
+    return cookie?.value ?? null
   })
 
 

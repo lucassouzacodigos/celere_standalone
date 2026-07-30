@@ -6,6 +6,7 @@
   "author": "example.com",
   "homepage": "https://electron-vite.org",
   "scripts": {
+    "dev:watch": "nodemon --watch src/main --watch src/preload --ext ts --exec \"electron-vite dev\"",
     "format": "prettier --write .",
     "lint": "eslint --cache .",
     "start": "electron-vite preview",
@@ -20,7 +21,8 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
-    "electron-updater": "^6.3.9"
+    "electron-updater": "^6.3.9",
+    "nodemon": "^3.1.14"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config": "^2.1.0",
