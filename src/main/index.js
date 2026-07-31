@@ -3,6 +3,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import {buscarProfissional} from './scripts/buscarProfissionais'
+import * as cheerio from 'cheerio'
 
 let dadoslogin
 
@@ -62,6 +63,7 @@ app.whenReady().then(async () => {
   ipcMain.handle('dados-login', () => {
     return dadoslogin
   })
+  
 
 
 
@@ -153,6 +155,76 @@ app.whenReady().then(async () => {
     console.log(cookie?.value)
     return cookie?.value ?? null
   })
+
+  //da get em todas as agendas na unidade logada
+  ipcMain.handle('consultar-profissionais-com-agendas', async () => {
+    const ses = session.fromPartition("persist:saude-session");
+    const agendasURL = "https://sistema.saudepublica.digital/celere.embudasartes/Pep/Agenda/ConsultaAgendamentoInicialToMaster"
+
+    const resposta = await ses.fetch(agendasURL)
+    const html = await resposta.text()
+
+    const $ = cheerio.load(html)
+
+    const select =  $("#ConsultaAgendamento_ControlComboProfissional")
+
+    console.log(select.html())
+    console.log(select.attr("id"))
+    
+    const profissionais = [];
+
+    select.find("option").each((_, option) => {
+      profissionais.push({
+        value: $(option).attr("value"),
+        texto: $(option).text().trim(),
+      });
+    });
+
+    return profissionais;
+  })
+
+  //Request pra verificar horarios com agendamentos de um dia especifico
+  ipcMain.handle('verificar-horarios-do-dia', async (event, dados) => {
+    console.log("IPCCAHAMDO")
+    const ses = session.fromPartition("persist:saude-session");
+    const requestDiaEspeficico = "https://sistema.saudepublica.digital/celere.embudasartes/Pep/Agenda/ConsultaListaHorariosAgendaProfissional"
+
+    const resposta = await ses.fetch(requestDiaEspeficico, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Requested-With": "XMLHttpRequest"
+      },
+      body: JSON.stringify(dados)
+    })
+    const html = await resposta.text()
+
+    const $ = cheerio.load(html)
+
+    const horarios = []
+
+    $("#grdConsultaAgendamentoHorarios tr").each((_, tr) => {
+      const tds = $(tr).find("td")
+
+      horarios.push({
+        hora: $(tds[0]).text().trim(),
+        usuario: $(tds[1]).text().trim(),
+        tipo: $(tds[2]).text().trim(),
+        observacao: $(tds[3]).text().trim(),
+
+        // atributos úteis do <tr>
+        horaConsulta: $(tr).attr("data-horaconsulta"),
+        horaComparecimento: $(tr).attr("data-horacomparecimento"),
+        seqAgenda: $(tr).attr("data-seqagenda"),
+        codParametroAgenda: $(tr).attr("data-codparametroagenda"),
+        liberaUso: $(tr).attr("data-liberauso") === "True",
+        encaixe: $(tr).attr("data-indencaixe") === "True",
+      })
+    })
+    console.log(horarios)
+    return horarios
+  })
+
 
 
 

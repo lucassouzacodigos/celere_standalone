@@ -22,6 +22,8 @@ if (process.contextIsolated) {
     getFastMedicSession: () => ipcRenderer.invoke('get-fast-medic-session'),
     dadosLogin: () => ipcRenderer.invoke('dados-login'),
     buscarProfissional: (dados) => ipcRenderer.invoke('buscar-profissional', dados),
+    consultarProfissionaisComAgendas: () => ipcRenderer.invoke('consultar-profissionais-com-agendas'),
+    verificarHorariosDoDia: (dados) => ipcRenderer.invoke('verificar-horarios-do-dia', dados)
 
   }
   window.api = api

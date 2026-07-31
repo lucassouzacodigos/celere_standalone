@@ -5,6 +5,17 @@
   box-sizing: border-box;
 }
 
+.go-to-home-btn{
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background-color: #57a35d;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
 
 .flex-center{
   display: flex;
@@ -32,6 +43,10 @@
   text-align: center;
   cursor: pointer;
   flex-direction: column;
+}
+
+.selectProfissional{
+  max-width: 40%;
 }
 
 
