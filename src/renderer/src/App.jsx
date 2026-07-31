@@ -2,10 +2,12 @@ import Versions from './components/Versions'
 import electronLogo from './assets/electron.svg'
 import { useEffect, useState } from 'react'
 import * as scripts from '../../main/scripts/scripts.js'
+import { useNavigate } from 'react-router-dom'
 
 function App() {
   const ipcHandle = () => window.electron.ipcRenderer.send('ping')
-
+  const navigate = useNavigate()
+  
   const [teste, setTeste] = useState()
   const [dados, setDados] = useState()
   const [FAST_SessionId, setFAST_SessionId] = useState("")
@@ -58,17 +60,9 @@ function App() {
     <div className="container">
       
       <div className="mainmenu flex-center">
-
-        <button onClick={openLoginPage}>Login</button>
-        <button onClick={scripts.consoleLogCookies}>Cookies</button>
-        <button onClick={getDadosLogin}>Atualizar Sessao</button>
-        <button onClick={scripts.teste}>aaaaaaa</button>
-        <button onClick={() => console.log(dados)}>Dados Login</button>
-        <button onClick={getFastMedicSession}>sessionID</button>
-        <button onClick={buscarProfissional}>Buscar Profissional</button>
-      </div>
-
-      <div dangerouslySetInnerHTML={{ __html: teste || "a" }}>
+        
+        <div style={{color: "#fff"}}>SEJA BEM VINDO!!!</div>
+        <button onClick={() => navigate("/home")}>Home</button>
 
       </div>
     </div>
