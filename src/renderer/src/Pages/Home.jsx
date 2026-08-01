@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import * as scripts from '../../../main/scripts/scripts.js'
 import { useNavigate } from 'react-router-dom'
+import HomeButton from '../components/HomeButton.jsx'
+import Spinner from '../components/Spinner.jsx'
 
 
 function Home() {
@@ -9,12 +11,32 @@ function Home() {
 	
 	const [teste, setTeste] = useState()
 	const [dados, setDados] = useState()
+	const [nome, setNome] = useState()
+	const [ocupacao, setOcupacao] = useState()
+	const [unidade, setUnidade] = useState()
+	const [subModulo, setSubModulo] = useState()
+
+
 	const [FAST_SessionId, setFAST_SessionId] = useState("")
 	const getDadosLogin = async () => {
 		const response = await window.electron.dadosLogin()
 		const FAST_SessionId = await window.electron.getFastMedicSession()
 		setDados(response)
+		console.log(response)
 		setFAST_SessionId(FAST_SessionId)
+
+		if (response){
+			const [nome, ocupacao] = response[0]
+			.replace("Bem vindo ", "")
+			.split(":")
+
+			const unidade = response[1].replace("Estabelecimento: ", "")
+
+			setNome(nome.trim())
+			setOcupacao(ocupacao.trim())
+			setUnidade(unidade.trim())
+			console.log("setos ocoorios")
+		}
 	}
 	
 	function getFastMedicSession() {
@@ -51,6 +73,18 @@ function Home() {
 	
 	useEffect(() => {
 		getDadosLogin()
+		window.electron.sendDadosUnidade(async(dados) => {
+			await getDadosLogin()
+			const [nome, ocupacao] = dados[0]
+			.replace("Bem vindo ", "")
+			.split(":")
+
+			const unidade = dados[1].replace("Estabelecimento: ", "")
+
+			setNome(nome.trim())
+			setOcupacao(ocupacao.trim())
+			setUnidade(unidade.trim())
+		})
 	}, [])
 	
 	
@@ -60,23 +94,39 @@ function Home() {
 	return (
 		<div className="container">
 
-		<div className='go-to-home-btn' onClick={() => navigate('/Home')}></div>
+			<HomeButton/>
+			
+			<div className="mainmenu flex-center">
+
+				{dados ? 
+					<div className="infoBox flex-center">
+						<p> <span style={{color: "black"}}>Usuário: </span>{nome || ""} </p>
+						<p> <span style={{color: "black"}}>Ocupação: </span>{ocupacao || ""} </p>
+						<p> <span style={{color: "black"}}>Unidade: </span>{unidade || ""} </p>
+						<p> <span style={{color: "black"}}>Módulo: </span>{dados?.[2].replace("SubMódulo: ", "")} </p>
+					</div>
+				: 
+					<div className="infoBox flex-center" style={{backgroundColor: "inherit"}} >
+					<Spinner/>
+					</div>
+				}
+			
+				<button onClick={openLoginPage}>{dados? "Atualizar Login" : "Login"}</button>
+				{/* <button onClick={scripts.consoleLogCookies}>Cookies</button> */}
+				{/* <button onClick={getDadosLogin}>Atualizar Sessao</button> */}
+				{/* <button onClick={scripts.teste}>aaaaaaa</button> */}
+				{/* <button onClick={() => console.log(dados)}>Dados Login</button> */}
+				{/* <button onClick={getFastMedicSession}>sessionID</button> */}
+				{/* <button onClick={buscarProfissional}>Buscar Profissional</button> */}
+				<button onClick={() => navigate('/ConsultarAgendas')}>Consultar Agendas</button>
+
+
+				
 		
-		<div className="mainmenu flex-center">
-		
-		<button onClick={openLoginPage}>Login</button>
-		<button onClick={scripts.consoleLogCookies}>Cookies</button>
-		<button onClick={getDadosLogin}>Atualizar Sessao</button>
-		<button onClick={scripts.teste}>aaaaaaa</button>
-		<button onClick={() => console.log(dados)}>Dados Login</button>
-		<button onClick={getFastMedicSession}>sessionID</button>
-		<button onClick={buscarProfissional}>Buscar Profissional</button>
-		<button onClick={() => navigate('/ConsultarAgendas')}>Consultar Agendas</button>
-		</div>
-		
-		<div dangerouslySetInnerHTML={{ __html: teste || "a" }}>
-		
-		</div>
+			</div>
+
+			
+
 		</div>
 	)
 }

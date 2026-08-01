@@ -3,18 +3,11 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: "Segoe UI", Arial, sans-serif;
 }
 
-.go-to-home-btn{
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  background-color: #57a35d;
-  width: 50px;
-  height: 50px;
-  cursor: pointer;
-  border-radius: 6px;
-}
+
+
 
 
 .flex-center{
@@ -35,15 +28,46 @@
 }
 
 .mainmenu{
+  position: relative;
   border-radius: 10px;
   height: 500px;
-  width: 500px;
+  width: 100%;
   background-color: #1f1f1f;
   color: #000;
   text-align: center;
-  cursor: pointer;
   flex-direction: column;
 }
+
+.infoBox{
+  position: absolute;
+  left: 0;
+  top: 0;
+  align-items: start;
+  margin: 10px;
+  padding: 15px;
+  border-radius: 3px;
+  height: auto;
+  width: auto;
+  background-color: #2e5c32;
+  color: #000;
+  text-align: start;
+  flex-direction: column;
+}
+
+.infoBox p{
+  border-bottom: 1px solid black;
+  margin:3px;
+  font-weight: bold;
+  font-size: 13px;
+  color: rgb(245, 245, 245);
+}
+
+
+
+
+
+
+
 
 .selectProfissional{
   max-width: 40%;
@@ -69,7 +93,7 @@ button{
   cursor: pointer;
   border-radius: 5px;
   box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
-  transition: background-color 80ms ease-in-out;
+  transition: background-color 100ms ease
 }
 
 button:hover{
@@ -81,4 +105,53 @@ button:active{
   background-color: #57a35d;
   color: #fff;
   transform: scale(0.90);
+}
+
+/* Home Button */
+.go-to-home-btn{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background-color: #57a35d;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: transform 100ms ease;
+}
+
+.go-to-home-btn img{
+  width: 70%;
+  height: 70%;
+}
+
+.go-to-home-btn:hover{
+  background-color: #57a35d;
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.go-to-home-btn:active{
+  background-color: #57a35d;
+  color: #fff;
+  transform: scale(0.90);
+}
+
+/* Spinner Carregando */
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid #ddd;
+  border-top: 3px solid #333;
+  border-radius: 50%;
+  animation: girar 1.5s linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
 }
