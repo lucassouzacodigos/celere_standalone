@@ -24,3 +24,9 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Upload do build
+        uses: actions/upload-artifact@v4
+        with:
+          name: electron-build
+          path: dist/
