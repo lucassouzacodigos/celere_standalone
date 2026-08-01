@@ -22,11 +22,11 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
-      - name: Build
-        run: npm run build
+      - name: Build Windows
+        run: npm run build:win
 
-      - name: Upload do build
+      - name: Upload do instalador
         uses: actions/upload-artifact@v4
         with:
-          name: electron-build
+          name: electron-windows
           path: dist/
