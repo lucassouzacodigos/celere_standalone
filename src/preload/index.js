@@ -23,7 +23,11 @@ if (process.contextIsolated) {
     dadosLogin: () => ipcRenderer.invoke('dados-login'),
     buscarProfissional: (dados) => ipcRenderer.invoke('buscar-profissional', dados),
     consultarProfissionaisComAgendas: () => ipcRenderer.invoke('consultar-profissionais-com-agendas'),
-    verificarHorariosDoDia: (dados) => ipcRenderer.invoke('verificar-horarios-do-dia', dados)
+    verificarHorariosDoDia: (dados) => ipcRenderer.invoke('verificar-horarios-do-dia', dados),
+    getUserIDByCNS: (dados) => ipcRenderer.invoke('get-user-id-by-cns', dados),
+    agendarUsuarioPorCPFouCNS: (dados) => ipcRenderer.invoke('agendar-usuario-por-cpfoucns', dados),
+    sendDadosUnidade: (callback) => {ipcRenderer.on('login-atualizado', (_event, dados) => {callback(dados)})
+}
 
   }
   window.api = api

@@ -6,10 +6,11 @@ import {buscarProfissional} from './scripts/buscarProfissionais'
 import * as cheerio from 'cheerio'
 
 let dadoslogin
+let mainWindow
 
 function createWindow() {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
     show: false,
@@ -63,6 +64,14 @@ app.whenReady().then(async () => {
   ipcMain.handle('dados-login', () => {
     return dadoslogin
   })
+
+
+  //ENvia as info após o login
+  async function sendDadosUnidade(dados){
+    dadoslogin = dados
+
+    mainWindow.webContents.send('login-atualizado', dadoslogin)
+  }
   
 
 
@@ -118,12 +127,13 @@ app.whenReady().then(async () => {
               [...document.querySelectorAll('.greeting-text')]
                   .map(el => el.textContent.trim());
           `);
-          dadoslogin = textos
-          console.log(dadoslogin)
+          console.log(textos)
+
+          await sendDadosUnidade(textos)
 
           setTimeout(() => {
             loginWindow.close()
-          }, 100)
+          }, 500)
         }, 1000)
       }
     })
@@ -198,6 +208,7 @@ app.whenReady().then(async () => {
       body: JSON.stringify(dados)
     })
     const html = await resposta.text()
+    console.log("VAGAS DO DIA NA CONSULTA AGENDA : ", html)
 
     const $ = cheerio.load(html)
 
@@ -219,11 +230,68 @@ app.whenReady().then(async () => {
         codParametroAgenda: $(tr).attr("data-codparametroagenda"),
         liberaUso: $(tr).attr("data-liberauso") === "True",
         encaixe: $(tr).attr("data-indencaixe") === "True",
+        codParametroAgenda: $(tr).attr("data-codparametroagenda"),
       })
     })
     console.log(horarios)
     return horarios
   })
+
+
+  // GET cidadaoID by cns
+  ipcMain.handle('get-user-id-by-cns', async (event, dados) => {
+    const ses = session.fromPartition("persist:saude-session");
+
+    const cidadaoInfo = await ses.fetch(
+      "https://sistema.saudepublica.digital/celere.embudasartes/CompartilhadoUsuario/BuscaUsuarioPorCartaoPesquisaUsuario",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Requested-With": "XMLHttpRequest"
+        },
+        body: JSON.stringify(dados)
+      }
+    );
+
+    const texto = await cidadaoInfo.text();
+    const json = JSON.parse(JSON.parse(texto));
+    
+    // console.log(json[0])
+    // console.log("texto: " + texto)
+    // console.log("---------------")
+    return json?.[0]
+  })
+
+  //AGENDAR INDIVIDUALMENTE UM USUARIO
+  ipcMain.handle('agendar-usuario-por-cpfoucns', async (event, dados) => {
+    const ses = session.fromPartition("persist:saude-session");
+
+    console.log("MAIN RECEBEU:", dados.seqAgenda);
+    console.log(JSON.stringify(dados, null, 2));
+
+    const resposta = await ses.fetch("https://sistema.saudepublica.digital/celere.embudasartes/Pep/Agenda/MarcarConsulta", {
+      method: "POST",
+      headers: {
+          "Content-Type": "application/json",
+          "X-Requested-With": "XMLHttpRequest"
+        },
+        body: JSON.stringify(dados)
+      });
+
+      if (resposta.ok) {
+      return {
+        sucesso: true,
+      };
+    }
+
+    return {
+      sucesso: false,
+    };
+
+    })
+
+    
 
 
 
