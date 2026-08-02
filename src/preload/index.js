@@ -26,8 +26,8 @@ if (process.contextIsolated) {
     verificarHorariosDoDia: (dados) => ipcRenderer.invoke('verificar-horarios-do-dia', dados),
     getUserIDByCNS: (dados) => ipcRenderer.invoke('get-user-id-by-cns', dados),
     agendarUsuarioPorCPFouCNS: (dados) => ipcRenderer.invoke('agendar-usuario-por-cpfoucns', dados),
-    sendDadosUnidade: (callback) => {ipcRenderer.on('login-atualizado', (_event, dados) => {callback(dados)})
-}
+    sendDadosUnidade: (callback) => {ipcRenderer.on('login-atualizado', (_event, dados) => {callback(dados)})},
+    limparCache: () => ipcRenderer.invoke('limpar-sessao'),
 
   }
   window.api = api

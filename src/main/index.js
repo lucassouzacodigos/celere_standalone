@@ -303,6 +303,25 @@ app.whenReady().then(async () => {
     })
 
     
+  ipcMain.handle('limpar-sessao', async () => {
+      const ses = session.fromPartition('persist:saude-session')
+
+      await ses.clearStorageData({
+          storages: [
+              'cookies',
+              'localstorage',
+              'indexdb',
+              'serviceworkers',
+              'cachestorage'
+          ]
+      })
+      dadoslogin = null
+
+      await ses.clearCache()
+
+      return true
+  })
+    
 
 
 

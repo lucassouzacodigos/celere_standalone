@@ -36,6 +36,10 @@ function Home() {
 			setOcupacao(ocupacao.trim())
 			setUnidade(unidade.trim())
 			console.log("setos ocoorios")
+		} else {
+			setNome("")
+			setOcupacao("")
+			setUnidade("")
 		}
 	}
 	
@@ -67,6 +71,19 @@ function Home() {
 	
 	const consoleLogCookies = () => {
 		window.electron.consoleLogCookies()
+	}
+
+	const limparCache = async () => {
+		const confirm = await window.electron.limparCache()
+		if (confirm) {
+        setDados(null)
+        setNome("")
+        setOcupacao("")
+        setUnidade("")
+        setFAST_SessionId("")
+
+        alert("Cache limpo")
+    	}
 	}
 
 	
@@ -106,19 +123,21 @@ function Home() {
 						<p> <span style={{color: "black"}}>Módulo: </span>{dados?.[2].replace("SubMódulo: ", "")} </p>
 					</div>
 				: 
-					<div className="infoBox flex-center" style={{backgroundColor: "inherit"}} >
+					<div className="infoBox flex-center" style={{backgroundColor: "#0a0a0a", flexDirection: "row", justifyContent: "start"}} >
 					<Spinner/>
+					<p style={{marginLeft: "10px"}}>Aguardando Login</p>
 					</div>
 				}
 			
-				<button onClick={openLoginPage}>{dados? "Atualizar Login" : "Login"}</button>
+				<button style={{backgroundColor: "lightblue"}} onClick={openLoginPage}>{dados? "Atualizar Login" : "Login"}</button>
 				{/* <button onClick={scripts.consoleLogCookies}>Cookies</button> */}
 				{/* <button onClick={getDadosLogin}>Atualizar Sessao</button> */}
 				{/* <button onClick={scripts.teste}>aaaaaaa</button> */}
 				{/* <button onClick={() => console.log(dados)}>Dados Login</button> */}
 				{/* <button onClick={getFastMedicSession}>sessionID</button> */}
 				{/* <button onClick={buscarProfissional}>Buscar Profissional</button> */}
-				<button onClick={() => navigate('/ConsultarAgendas')}>Consultar Agendas</button>
+				<button style={{backgroundColor: "lightblue"}} onClick={() => navigate('/ConsultarAgendas')}>Consultar Agendas</button>
+				<button style={{backgroundColor: "lightblue"}} onClick={limparCache}>Limpar Cache</button>
 
 
 				
