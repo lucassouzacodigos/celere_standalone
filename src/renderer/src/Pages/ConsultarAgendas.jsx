@@ -168,12 +168,13 @@ export default function ConsultarAgendas() {
     
     
     return (
-        <div className='container'>
+        <div className='container flex-center'>
         <HomeButton />
         
         <p>ID Do Profissional: {profissionalId}</p>
         <p>Tipo Agenda: {tipoAgenda}</p>
         <p>CBO Profissional: {idCBOProfissional}</p>
+        
         <select onChange={selecionarProfissional} className='selectProfissional'>
         {profissionais.map((profissional) => (
             <option
@@ -185,14 +186,11 @@ export default function ConsultarAgendas() {
         ))}
         </select>
         
-        
-        
         <h1>Consultar Agendas</h1>
-        
 
         {/* BOTOES */}
-        <button onClick={consultarProfissionaisComAgendas}>pagina consultar agendas</button>
-        <button style={{ backgroundColor: "yellow" }} onClick={verificarHorariosDoDia}>Consultar horarios de um dia especifico</button>
+        {/* <button onClick={consultarProfissionaisComAgendas}>pagina consultar agendas</button> */}
+        <button onClick={verificarHorariosDoDia}>Consultar horarios de um dia especifico</button>
         
         <input type="date" onChange={(e) => {
             const data = e.target.value; // yyyy-mm-dd
@@ -201,9 +199,9 @@ export default function ConsultarAgendas() {
         }}
         ></input>
 
-        <button onClick={() => console.log(horarios)}>printar horarios</button>
-        <button onClick={() => getUserIDByCNS(700002485791400)}>pegar id do cidadao</button>
-        <button onClick={salvar}>testar agendamento total</button>
+        <button onClick={salvar}>Agendar Todos</button>
+        {/* <button onClick={() => console.log(horarios)}>printar horarios no console</button> */}
+        {/* <button onClick={() => getUserIDByCNS(700002485791400)}>Testar get userID pelo cns</button> */}
         
         <div style={{ display: "flex", flexDirection: "column", overflowY: "auto" }}>
         {horarios &&
