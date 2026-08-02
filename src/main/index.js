@@ -112,12 +112,13 @@ app.whenReady().then(async () => {
     loginWindow.loadURL("https://sistema.saudepublica.digital/celere.embudasartes")
 
     loginWindow.webContents.on("did-finish-load", () => {
+      //AUTOLOGIN
       loginWindow.webContents.executeJavaScript(`
-          document.querySelector("#inputUsuario").value = "44957764875"
+          document.querySelector("#inputUsuario").value = ""
         `)
 
       loginWindow.webContents.executeJavaScript(`
-          document.querySelector("#inputSenha").value = "uhjbnm1234"
+          document.querySelector("#inputSenha").value = ""
         `)
     })
 
@@ -268,10 +269,17 @@ app.whenReady().then(async () => {
     const texto = await cidadaoInfo.text();
     const json = JSON.parse(JSON.parse(texto));
     
+    // console.log(json)
     // console.log(json[0])
-    // console.log("texto: " + texto)
+    console.log("texto: " + texto)
     // console.log("---------------")
-    return json?.[0]
+    if (texto == "[]") {
+      return "erro"
+    } else {
+      return json?.[0]
+    }
+
+    
   })
 
   //AGENDAR INDIVIDUALMENTE UM USUARIO
@@ -289,6 +297,7 @@ app.whenReady().then(async () => {
         },
         body: JSON.stringify(dados)
       });
+      console.log("resposta MAIN: ", resposta)
 
       if (resposta.ok) {
       return {
