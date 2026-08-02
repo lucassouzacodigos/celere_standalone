@@ -192,7 +192,7 @@ export default function ConsultarAgendas() {
 
         {/* BOTOES */}
         <button onClick={consultarProfissionaisComAgendas}>pagina consultar agendas</button>
-        <button onClick={verificarHorariosDoDia}>Consultar horarios de um dia especifico</button>
+        <button style={{ backgroundColor: "yellow" }} onClick={verificarHorariosDoDia}>Consultar horarios de um dia especifico</button>
         
         <input type="date" onChange={(e) => {
             const data = e.target.value; // yyyy-mm-dd
