@@ -1,9 +1,11 @@
 import { app, shell, BrowserWindow, ipcMain, session } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { autoUpdater } from 'electron-updater'
 import icon from '../../resources/icon.png?asset'
 import {buscarProfissional} from './scripts/buscarProfissionais'
 import * as cheerio from 'cheerio'
+
 
 let dadoslogin
 let mainWindow
@@ -45,6 +47,15 @@ function createWindow() {
 
 //WHENR READY ---------------------------------------------
 app.whenReady().then(async () => {
+  autoUpdater.autoDownload = true
+
+  autoUpdater.on('update-downloaded', () => {
+    autoUpdater.quitAndInstall()
+  })
+
+  await autoUpdater.checkForUpdates()
+
+
   const ses = session.fromPartition("persist:saude-session");
   //limpa cache
   await ses.clearStorageData();
