@@ -43,6 +43,7 @@
     "vite": "^7.2.6"
   },
   "build": {
+    "artifactName": "Celere-Standalone-Setup-${version}.${ext}",
     "appId": "com.celere.standalone",
     "productName": "Celere Standalone",
     "publish": [
