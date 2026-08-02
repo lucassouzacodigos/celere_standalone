@@ -3,6 +3,9 @@ import "../assets/main.css"
 import { useEffect, useState } from 'react'
 import casinha from "../assets/home.png"
 import HomeButton from "../components/HomeButton"
+import DatePicker from "react-datepicker"
+import 'react-datepicker/dist/react-datepicker.css'
+
 
 export default function ConsultarAgendas() {
     const navigate = useNavigate()
@@ -192,6 +195,9 @@ export default function ConsultarAgendas() {
         {/* <button onClick={consultarProfissionaisComAgendas}>pagina consultar agendas</button> */}
         <button onClick={verificarHorariosDoDia}>Consultar horarios de um dia especifico</button>
         
+
+
+
         <input type="date" onChange={(e) => {
             const data = e.target.value; // yyyy-mm-dd
             const [ano, mes, dia] = data.split("-");
@@ -206,36 +212,35 @@ export default function ConsultarAgendas() {
         <div style={{ display: "flex", flexDirection: "column", overflowY: "auto" }}>
         {horarios &&
             horarios.map((horario, index) => (
-                <div
-                key={index}
-                style={{
-                    border: "1px solid black",
-                    display: "flex",
-                    flexDirection: "row",
-                    margin: 10,
-                    padding: 10,
-                }}
-                >
-                <p style={{ margin: 2 }}>{horario.hora}</p>
+                <div key={index} className="flex-center horarioBlock" >
                 
-                {horario.usuario ? (
-                    <p style={{ margin: 2 }}>{horario.usuario}</p>
-                ) : (
-                    <input
-                    value={cnsParaAgendar[horario.seqAgenda] || ""}
-                    onChange={(e) => {
-                        setCnsParaAgendar((prev) => ({
-                            ...prev,
-                            [horario.seqAgenda]: e.target.value,
-                        }))}
-                    }
-                    />
-                )}
+                    {/* parte de cima do bloco */}
+                    <div style={{ display: "flex", flexDirection: "row", width: "100%", alignItems: "center" }}>
+
+                        {/* Horas, todo bloco vai ter, independente */}
+                        <p id='horaConsulta' style={{ margin: 2 }}>{horario.hora}</p>
+
+                        {/* Usuario na frente da hora */}
+                        {horario.usuario 
+                        ? ( <p className="titulosBranco">{horario.usuario}</p>) 
+                        : horario.tipo ? (<p style={{ margin: 2 }}>{"Vaga bloqueada"}</p>) 
+                        : (
+                            <input
+                            value={cnsParaAgendar[horario.seqAgenda] || ""}
+                            onChange={(e) => {
+                                setCnsParaAgendar((prev) => ({
+                                    ...prev,
+                                    [horario.seqAgenda]: e.target.value,
+                                }))}
+                            }
+                            />
+                        )}
+                    </div>
+
+                    
                 
-                <p style={{ margin: 2 }}>{horario.seqAgenda}</p>
                 <p style={{ margin: 2 }}>{horario.tipo}</p>
                 <p style={{ margin: 2 }}>{horario.observacao}</p>
-                <p style={{ margin: 2 }}>{horario.horaConsulta}</p>
                 </div>
             ))}
             </div>

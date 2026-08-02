@@ -65,7 +65,11 @@ function Home() {
 		console.log(response)
 	}
 	
-	const openLoginPage = () => {
+	const openLoginPage = async () => {
+		if (dados) {
+			limparCache()
+		}
+
 		window.electron.openLoginPage()
 	}
 	
@@ -82,7 +86,6 @@ function Home() {
         setUnidade("")
         setFAST_SessionId("")
 
-        alert("Cache limpo")
     	}
 	}
 
@@ -102,7 +105,7 @@ function Home() {
 			setOcupacao(ocupacao.trim())
 			setUnidade(unidade.trim())
 		})
-	}, [])
+	}, [ocupacao])
 	
 	
 	
@@ -129,15 +132,14 @@ function Home() {
 					</div>
 				}
 			
-				<button style={{backgroundColor: "lightblue"}} onClick={openLoginPage}>{dados? "Atualizar Login" : "Login"}</button>
+				<button onClick={openLoginPage}>{dados? "Atualizar Login" : "Login"}</button>
 				{/* <button onClick={scripts.consoleLogCookies}>Cookies</button> */}
 				{/* <button onClick={getDadosLogin}>Atualizar Sessao</button> */}
 				{/* <button onClick={scripts.teste}>aaaaaaa</button> */}
 				{/* <button onClick={() => console.log(dados)}>Dados Login</button> */}
 				{/* <button onClick={getFastMedicSession}>sessionID</button> */}
 				{/* <button onClick={buscarProfissional}>Buscar Profissional</button> */}
-				<button style={{backgroundColor: "lightblue"}} onClick={() => navigate('/ConsultarAgendas')}>Consultar Agendas</button>
-				<button style={{backgroundColor: "lightblue"}} onClick={limparCache}>Limpar Cache</button>
+				<button onClick={() => navigate('/ConsultarAgendas')}>Consultar Agendas</button>
 
 
 				
