@@ -1,6 +1,6 @@
 {
   "name": "celere_standalone",
-  "version": "1.0.3",
+  "version": "1.0.6",
   "description": "An Electron application with React",
   "main": "./out/main/index.js",
   "author": "example.com",
