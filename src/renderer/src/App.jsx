@@ -3,6 +3,7 @@ import electronLogo from './assets/electron.svg'
 import { useEffect, useState } from 'react'
 import * as scripts from '../../main/scripts/scripts.js'
 import { useNavigate } from 'react-router-dom'
+import logo from './assets/celerelogo.png'
 
 function App() {
   const ipcHandle = () => window.electron.ipcRenderer.send('ping')
@@ -59,10 +60,15 @@ function App() {
   return (
     <div className="container">
       
-      <div className="mainmenu flex-center">
-        
-        <div style={{color: "#fff"}}>SEJA BEM VINDO!!!</div>
-        <button onClick={() => navigate("/home")}>Home</button>
+      <div className="mainmenu flex-center" style={{backgroundColor: "#57c46e"}}>
+
+        <div className='flex-center' style={{backgroundColor:""}}>
+          <img src={logo} style={{transform: "translateX(-10px)"}} className="logo" alt="" />
+          <p style={{color:"black", fontSize: "35px", fontWeight: "bold"}} >CÉLERE</p>
+        </div>
+
+        {/* <div style={{color: "#fff"}}>SEJA BEM VINDO!!!</div> */}
+        <button onClick={() => navigate("/home")}>Começar</button>
 
       </div>
     </div>

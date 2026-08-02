@@ -13,7 +13,11 @@
 
 
 
-
+.logo{
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+}
 
 .flex-center{
   display: flex;
@@ -67,41 +71,213 @@
   color: rgb(245, 245, 245);
 }
 
+.configs{
+  position: relative;
+  width: 95%;
+  min-height: 250px;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: start;
+  background-color: #1f1f1f;
+  margin-bottom: 5px;
+  border-radius: 10px;
+  padding: 15px;
+}
+
 
 /* STYLES DE CADA CARDZINHO DOS HORARIOS DE CONSULTA */
-.horarioBlock {
+/* Área onde ficam os horários */
+.horariosContainer {
+  background-color: #1f1f1f;
+  width: 95%;
+  border-radius: 10px;
+  max-width: 1100px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(600px, 1fr));
+  gap: 10px;
+  padding: 15px;
+  overflow-y: auto;
   align-items: start;
-  justify-content: start;
-  flex-direction: column;
-  background-color: rgb(112, 112, 112);
-  border-radius: 5px;
-  padding-left: 5px;
-  padding-top: 15px;
-  padding-bottom: 15px;
-  margin: 3px;
-  height: 350px;
-  min-height: 100px;
-  width: 480px;
-
 }
 
-.titulosBranco {
-  margin: 2; 
-  color: white;
-  font-size: 18px;
-  font-weight: 500;
-}
 
-#horaConsulta {
-  text-align: center;
-  color: #000;
+/* CARD DE CADA HORÁRIO */
+.horarioBlock {
   width: auto;
-  font-size: 18px;
-  min-width: 50px;
-  font-weight: 500;
+  min-height: 100px;
+  height: auto;
+
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+
+  background: #292929;
+  border: 1px solid #444;
+  border-left: 5px solid var(--verdeElementos);
+  border-radius: 8px;
+
+  padding: 12px;
+  margin: 7px;
+
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease,
+    background-color 120ms ease;
+}
+
+.horarioBlock:hover {
+  background: #303030;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.35);
+
+}
+
+
+/* LINHA SUPERIOR DO CARD */
+.horarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+
+/* HORA */
+#horaConsulta {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  min-width: 65px;
+  width: 65px;
+
+  margin: 0;
+
+  padding: 7px 8px;
+
   background-color: var(--verdeElementos);
-  padding: 4px 5px;
+  color: #000;
+
+  border-radius: 6px;
+
+  font-size: 16px;
+  font-weight: 700;
+}
+
+
+/* NOME DO USUÁRIO */
+.titulosBranco {
+  margin: 0;
+  color: #fff;
+
+  font-size: 16px;
+  font-weight: 500;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* INFORMAÇÕES SECUNDÁRIAS */
+.horarioInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  margin-top: 10px;
+  padding-top: 8px;
+
+  border-top: 1px solid #444;
+}
+
+.horarioInfo p {
+  margin: 0;
+
+  color: #cfcfcf;
+
+  font-size: 13px;
+}
+
+.horarioInfo strong {
+  color: #fff;
+}
+
+
+/* VAGA BLOQUEADA */
+.vagaBloqueada {
+  color: #ffcc66 !important;
+  font-weight: 600;
+}
+
+
+/* INPUT DE CNS */
+.horarioHeader input {
+  flex: 1;
+
+  min-width: 0;
+  height: 36px;
+
+  padding: 6px 10px;
+
+  border: 1px solid #555;
   border-radius: 5px;
+
+  background: #1e1e1e;
+  color: #fff;
+
+  outline: none;
+
+  font-size: 14px;
+}
+
+.horarioHeader input:focus {
+  border-color: var(--verdeElementos);
+  box-shadow: 0 0 0 2px rgba(147, 250, 155, 0.15);
+}
+
+.horarioHeader input::placeholder {
+  color: #777;
+}
+
+
+/* SCROLLBAR */
+.horariosContainer::-webkit-scrollbar {
+  width: 8px;
+}
+
+.horariosContainer::-webkit-scrollbar-track {
+  background: #1f1f1f;
+}
+
+.horariosContainer::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 5px;
+}
+
+.horariosContainer::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+.metadados{
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: 1px solid #444;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px;
+  background-color: #292929;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.metadados p {
+  margin: 0;
+  color: #cfcfcf;
+  font-size: 14px;
 }
 
 
@@ -114,7 +290,7 @@
 
 
 .selectProfissional{
-  max-width: 40%;
+  width: 99%;
 }
 
 
@@ -159,33 +335,123 @@ option{
 
 
 /* BUTTON STYLLE */
-button{
-  font-weight: bold;
-  font-size: 14px;
+button {
+  position: relative;
+
   min-width: 200px;
   margin: 5px;
-  border: none;
-  outline: none;
-  padding: 10px 20px;
-  background-color: #93fa9b;
-  color: #000;
+  padding: 11px 20px;
+
+  border: 1px solid rgba(147, 250, 155, 0.25);
+  border-radius: 7px;
+
+  background: linear-gradient(
+    135deg,
+    #93fa9b,
+    #78df82
+  );
+
+  color: #102312;
+
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+
   cursor: pointer;
-  border-radius: 5px;
-  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
-  transition: background-color 100ms ease
+
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+
+  transition:
+    transform 120ms ease,
+    background 150ms ease,
+    box-shadow 150ms ease,
+    filter 150ms ease;
 }
 
-button:hover{
-  background-color: #57a35d;
-  color: #fff;
-  box-shadow: 4px 4px 4px rgb(9, 71, 12);
+
+/* HOVER */
+
+button:hover {
+  background: linear-gradient(
+    135deg,
+    #a5ffad,
+    #86e88f
+  );
+
+  color: #102312;
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 6px 12px rgba(0, 0, 0, 0.3),
+    0 0 8px rgba(147, 250, 155, 0.15);
 }
 
-button:active{
-  background-color: #57a35d;
-  color: #fff;
-  transform: scale(0.90);
+
+/* CLICK */
+
+button:active {
+  transform: translateY(0) scale(0.97);
+
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.25);
+
+  filter: brightness(0.92);
 }
+
+
+/* FOCO */
+
+button:focus-visible {
+  outline: 2px solid rgba(147, 250, 155, 0.8);
+  outline-offset: 2px;
+}
+
+
+/* DESABILITADO */
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+
+  transform: none;
+
+  box-shadow: none;
+}
+
+button:disabled:hover {
+  transform: none;
+  filter: none;
+}
+
+.buttonSecondary {
+  background: #3a3a3a;
+  color: #fff;
+  border: 1px solid #555;
+}
+
+.buttonSecondary:hover {
+  background: #454545;
+}
+
+.buttonDanger {
+  background: #d9534f;
+  color: #fff;
+  border: none;
+}
+
+.buttonDanger:hover {
+  background: #e05d59;
+}
+
+
+
+
+
+
+
 
 /* Home Button */
 .go-to-home-btn{
@@ -234,4 +500,53 @@ button:active{
   to {
     transform: rotate(360deg);
   }
+}
+
+.inputData {
+  width: 220px;
+  height: 43px;
+
+  padding: 0 14px;
+
+  background-color: #93fa9b;
+  color: #000;
+
+  border: none;
+  border-radius: 7px;
+
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  outline: none;
+
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
+
+  transition:
+    background-color 150ms ease,
+    transform 120ms ease,
+    box-shadow 150ms ease;
+}
+
+/* Quando passa o mouse */
+.inputData:hover {
+  background-color: #a5ffad;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Quando está selecionado */
+.inputData:focus {
+  box-shadow:
+    0 0 0 2px rgba(147, 250, 155, 0.4),
+    0 4px 8px rgba(0, 0, 0, 0.25);
+}
+
+/* Ícone do calendário */
+.inputData::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  padding: 4px;
 }

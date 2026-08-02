@@ -5,6 +5,8 @@ import casinha from "../assets/home.png"
 import HomeButton from "../components/HomeButton"
 import DatePicker from "react-datepicker"
 import 'react-datepicker/dist/react-datepicker.css'
+import { motion } from "motion/react"
+import { SaveAll, UserSearch } from "lucide-react"
 
 
 export default function ConsultarAgendas() {
@@ -15,9 +17,10 @@ export default function ConsultarAgendas() {
     const [idCBOProfissional, setIdCBOProfissional] = useState("");
     const [horarios, setHorarios] = useState();
     const [FAST_SessionId, setFAST_SessionId] = useState("")
-    const [data_selecionada, setData_selecionada] = useState("")
+    const [data_selecionada, setData_selecionada] = useState(new Date())
     const [cidadaoID, setCidadaoID] = useState("")
     const [cnsParaAgendar, setCnsParaAgendar] = useState({})
+    const [errosAgendamento, setErrosAgendamento] = useState({})
     
     const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -49,6 +52,7 @@ export default function ConsultarAgendas() {
 
         await sleep(150);
     }
+    console.log(errosAgendamento)
 };
 
     const agendarUsuarioPorCPFouCNS = async (documento, seqAgenda, codParametroAgenda) => {
@@ -81,13 +85,19 @@ export default function ConsultarAgendas() {
             "session":FAST_SessionId
         }
 
+        if (IDCidadao == undefined) {
+            console.log("Erro ao agendar, CNS Nao cadastrado")
+            setErrosAgendamento((prev) => ({
+                ...prev,
+                [seqAgenda]: documento,
+            }))
+            return;
+        }
 
         const response = await window.electron.agendarUsuarioPorCPFouCNS(dados)
 
         if (response.sucesso) {
             console.log("Agendado com sucesso")
-        } else {
-            console.log("Erro ao agendar")
         }
 
     }
@@ -100,7 +110,17 @@ export default function ConsultarAgendas() {
         }
         
         const response = await window.electron.getUserIDByCNS(dados)
+        
+        if (response == "[]") {
+            console.log("cns = []")
+            return "[]"
+        } else {
+            return response?.CodUsuario
+        }
+
+
         console.log("Documento: ", documento, "| ID: ", response?.CodUsuario)
+        alert("Documento: " + documento + "| ID: " + response?.CodUsuario)
         return response?.CodUsuario
     }
     
@@ -171,51 +191,101 @@ export default function ConsultarAgendas() {
     
     
     return (
-        <div className='container flex-center'>
+        <div className='container flex-center' style={{flexDirection: "column", justifyContent: "flex-start", paddingTop: 80}}>
+
         <HomeButton />
-        
-        <p>ID Do Profissional: {profissionalId}</p>
-        <p>Tipo Agenda: {tipoAgenda}</p>
-        <p>CBO Profissional: {idCBOProfissional}</p>
-        
-        <select onChange={selecionarProfissional} className='selectProfissional'>
-        {profissionais.map((profissional) => (
-            <option
-            key={profissional.value}
-            value={profissional.value}
-            >
-            {profissional.texto}    
-            </option>
-        ))}
-        </select>
-        
-        <h1>Consultar Agendas</h1>
-
-        {/* BOTOES */}
-        {/* <button onClick={consultarProfissionaisComAgendas}>pagina consultar agendas</button> */}
-        <button onClick={verificarHorariosDoDia}>Consultar horarios de um dia especifico</button>
-        
 
 
+        {Object.entries(errosAgendamento).map(([seqAgenda, documento]) => {
+            const horario = horarios?.find(
+                h => String(h.seqAgenda) === String(seqAgenda)
+            )
 
-        <input type="date" onChange={(e) => {
-            const data = e.target.value; // yyyy-mm-dd
-            const [ano, mes, dia] = data.split("-");
-            setData_selecionada(`${dia}/${mes}/${ano}`);
-        }}
-        ></input>
+            return (
+                <li key={seqAgenda}>
+                    {horario?.hora} — CNS: {documento}
+                </li>
+            )
+        })}
 
-        <button onClick={salvar}>Agendar Todos</button>
-        {/* <button onClick={() => console.log(horarios)}>printar horarios no console</button> */}
-        {/* <button onClick={() => getUserIDByCNS(700002485791400)}>Testar get userID pelo cns</button> */}
-        
-        <div style={{ display: "flex", flexDirection: "column", overflowY: "auto" }}>
+        <div className='configs flex-center' style={{}}> 
+            
+            
+            
+            
+            <h1>Consultar Agendas</h1>
+
+            {/* BOTOES */}
+            {/* <button onClick={consultarProfissionaisComAgendas}>pagina consultar agendas</button> */}
+            
+            {/* metadados */}
+            <div className='metadados'>
+                Metadados:
+                <p>ID Do Profissional: {profissionalId}</p>
+                <p>Tipo Agenda: {tipoAgenda}</p>
+                <p>CBO Profissional: {idCBOProfissional}</p>
+                <button style={{transform: "scale(0.9)", display: "flex", justifyContent: "space-around", alignItems: "center" }} onClick={salvar}> <SaveAll /> Agendar Todos</button>
+            </div>
+            
+            <div className='selectDias flex-center'>
+                <button onClick={verificarHorariosDoDia}>Consultar Hórarios</button>
+                
+                <input className='inputData' type="date"  onChange={(e) => {
+                    const data = e.target.value; // yyyy-mm-dd
+                    const [ano, mes, dia] = data.split("-");
+                    setData_selecionada(`${dia}/${mes}/${ano}`);
+                }}
+                ></input>
+
+                
+
+
+            </div>
+                
+
+            {/* SELECT DO PROFISSIONAL */}
+            <select onChange={selecionarProfissional} className='selectProfissional'>
+            <option style={{textAlign: "center"}} value="">SELECIONE O PROFISSIONAL</option>
+            {profissionais.map((profissional) => (
+                <option
+                key={profissional.value}
+                value={profissional.value}
+                >
+                {profissional.texto}    
+                </option>
+            ))}
+            </select>
+
+            
+            {/* <button onClick={() => console.log(horarios)}>printar horarios no console</button> */}
+            {/* <button onClick={() => getUserIDByCNS(704503385992918)}>Testar get userID pelo cns</button> */}
+        </div>
+
+        {/* -------------------------------------------------- */}
+    
+        <div className="horariosContainer">
+            <p >Horarios: </p>
         {horarios &&
             horarios.map((horario, index) => (
-                <div key={index} className="flex-center horarioBlock" >
+                <motion.div
+                    key={index}
+                    className="horarioBlock"
+                    initial={{
+                        opacity: 0,
+                        y: 80
+                    }}
+                    animate={{
+                        opacity: 1,
+                        y: 0
+                    }}
+                    transition={{
+                        duration: 0.3,
+                        delay: index * 0.08
+                    }}
+                >
                 
                     {/* parte de cima do bloco */}
-                    <div style={{ display: "flex", flexDirection: "row", width: "100%", alignItems: "center" }}>
+                    <div className="horarioHeader">
 
                         {/* Horas, todo bloco vai ter, independente */}
                         <p id='horaConsulta' style={{ margin: 2 }}>{horario.hora}</p>
@@ -223,7 +293,7 @@ export default function ConsultarAgendas() {
                         {/* Usuario na frente da hora */}
                         {horario.usuario 
                         ? ( <p className="titulosBranco">{horario.usuario}</p>) 
-                        : horario.tipo ? (<p style={{ margin: 2 }}>{"Vaga bloqueada"}</p>) 
+                        : horario.tipo ? (<p className="vagaBloqueada">{"Vaga bloqueada"}</p>) 
                         : (
                             <input
                             value={cnsParaAgendar[horario.seqAgenda] || ""}
@@ -237,12 +307,17 @@ export default function ConsultarAgendas() {
                         )}
                     </div>
 
-                    
-                
-                <p style={{ margin: 2 }}>{horario.tipo}</p>
-                <p style={{ margin: 2 }}>{horario.observacao}</p>
-                </div>
-            ))}
+                    <div className="horarioInfo">
+                        <p>
+                            <strong>Tipo:</strong> {horario.tipo || "—"}
+                        </p>
+
+                        <p>
+                            <strong>Observação:</strong> {horario.observacao || "—"}
+                        </p>
+                    </div>
+                </motion.div>
+            )) || "Selecione o profissional e a data"}
             </div>
             
             </div>
