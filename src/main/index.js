@@ -220,7 +220,7 @@ app.whenReady().then(async () => {
       body: JSON.stringify(dados)
     })
     const html = await resposta.text()
-    console.log("VAGAS DO DIA NA CONSULTA AGENDA : ", html)
+    // console.log("VAGAS DO DIA NA CONSULTA AGENDA : ", html)
 
     const $ = cheerio.load(html)
 
@@ -245,7 +245,7 @@ app.whenReady().then(async () => {
         codParametroAgenda: $(tr).attr("data-codparametroagenda"),
       })
     })
-    console.log(horarios)
+    console.log(horarios[0])
     return horarios
   })
 
@@ -287,7 +287,7 @@ app.whenReady().then(async () => {
     const ses = session.fromPartition("persist:saude-session");
 
     console.log("MAIN RECEBEU:", dados.seqAgenda);
-    console.log(JSON.stringify(dados, null, 2));
+    // console.log(JSON.stringify(dados, null, 2));
 
     const resposta = await ses.fetch("https://sistema.saudepublica.digital/celere.embudasartes/Pep/Agenda/MarcarConsulta", {
       method: "POST",
@@ -311,7 +311,7 @@ app.whenReady().then(async () => {
 
     })
 
-    
+    ////LIMPAR LOGIN E DADOS DA SESSAO
   ipcMain.handle('limpar-sessao', async () => {
       const ses = session.fromPartition('persist:saude-session')
 
@@ -329,6 +329,48 @@ app.whenReady().then(async () => {
       await ses.clearCache()
 
       return true
+  })
+
+
+  //GET LISTA COM HORARIOS PARA DELETAR
+  ipcMain.handle("get-lista-com-horarios-para-deletar", async (event, dados) => {
+    console.log("IPCCHAMADO")
+    const ses = session.fromPartition("persist:saude-session");
+
+
+    const resposta = await ses.fetch("https://sistema.saudepublica.digital/celere.embudasartes/Pep/Agenda/ListaHorariosAgendaProfissionalParaRemanejar" ,  {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Requested-With": "XMLHttpRequest"
+      },
+      body: JSON.stringify(dados)
+    })
+
+    const parsed = await resposta.json()
+    const parsed2 = JSON.parse(parsed)
+    
+    console.log(parsed2.Resultado)
+    return parsed2.Resultado
+
+
+    // console.log("resposta: " + await resposta.json())
+  })
+
+
+
+  //EXCLUIR UM UNICO AGENDAMENTO
+  ipcMain.handle("deletar-agendamento-usuario", async (event, dados) => {
+    const ses = session.fromPartition("persist:saude-session");
+    const resposta = await ses.fetch("https://sistema.saudepublica.digital/celere.embudasartes/Pep/Agenda/ExcluirAgendamento",  {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Requested-With": "XMLHttpRequest"
+      },
+      body: JSON.stringify(dados)
+    })
+    return await resposta.json()
   })
     
 

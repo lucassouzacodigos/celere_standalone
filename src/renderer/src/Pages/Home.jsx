@@ -139,7 +139,7 @@ function Home() {
 				{/* <button onClick={() => console.log(dados)}>Dados Login</button> */}
 				{/* <button onClick={getFastMedicSession}>sessionID</button> */}
 				{/* <button onClick={buscarProfissional}>Buscar Profissional</button> */}
-				<button onClick={() => navigate('/ConsultarAgendas')}>Consultar Agendas</button>
+				<button onClick={() => navigate('/ConsultarAgendas')}>Agendar consultas</button>
 
 
 				
