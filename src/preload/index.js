@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
+import { data } from 'react-router-dom'
 
 // Custom APIs for renderer
 const api = {}
@@ -28,7 +29,8 @@ if (process.contextIsolated) {
     agendarUsuarioPorCPFouCNS: (dados) => ipcRenderer.invoke('agendar-usuario-por-cpfoucns', dados),
     sendDadosUnidade: (callback) => {ipcRenderer.on('login-atualizado', (_event, dados) => {callback(dados)})},
     limparCache: () => ipcRenderer.invoke('limpar-sessao'),
-
+    getListaComHorariosParaDeletar: (dados) => ipcRenderer.invoke('get-lista-com-horarios-para-deletar', dados),
+    deletarHorario: (dados) => ipcRenderer.invoke('deletar-agendamento-usuario', dados),
   }
   window.api = api
 }

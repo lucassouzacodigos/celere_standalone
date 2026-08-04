@@ -6,7 +6,7 @@ import HomeButton from "../components/HomeButton"
 import DatePicker from "react-datepicker"
 import 'react-datepicker/dist/react-datepicker.css'
 import { motion } from "motion/react"
-import { SaveAll, UserSearch } from "lucide-react"
+import { SaveAll, Trash2, UserSearch } from "lucide-react"
 
 
 export default function ConsultarAgendas() {
@@ -52,6 +52,8 @@ export default function ConsultarAgendas() {
 
         await sleep(150);
     }
+
+    await verificarHorariosDoDia()
     console.log(errosAgendamento)
 };
 
@@ -101,7 +103,64 @@ export default function ConsultarAgendas() {
         }
 
     }
-    
+
+    const deletarAgendamentoUsuario = async (codParametroAgenda, seqAgendaDelete) => {
+
+        await getDadosLogin()
+
+        //pega a lista de quem pode ser deletado no dia
+        const agendaCompletaParaDeletar = await getListaComHorariosParaDeletar()
+        console.log(agendaCompletaParaDeletar)
+
+        const objetoToDelete = await agendaCompletaParaDeletar.find(obj => {
+            return obj.SeqAgenda == seqAgendaDelete && 
+            obj.CodParametroAgenda == codParametroAgenda
+        })
+        // console.log(agendaCompletaParaDeletar)
+
+
+        //MONTA A DATA EM FORMATO ISO, JA QUE O END POINT PEDE
+        const [dia, mes, ano] = data_selecionada.split("/");
+        const dataISO = new Date(
+        `${ano}-${mes}-${dia}T00:00:00-03:00`
+        ).toISOString();
+        console.log(dataISO);
+
+        const dados = {
+            "codProfissional":profissionalId,
+            "codTipoCancelamentoAgendamento":4,  /// 4 = outros
+            "dataOrigem":dataISO,
+            "listaAgendamento":[
+                objetoToDelete
+            ],
+            "session":FAST_SessionId
+        }
+
+        const deletarHorario = await window.electron.deletarHorario(dados)
+        
+        await verificarHorariosDoDia()
+    }
+
+    // faz request no end point que retorna os usuarios que podem ser deletados
+    const getListaComHorariosParaDeletar = async () => {
+
+        await getDadosLogin()
+        
+        const dados = {
+            "codProfissional":profissionalId,
+            "codSiasusSms":tipoAgenda,
+            "dataSelecionada":data_selecionada,
+            "tipVisualizacao":2,
+            "indTeleatendimento":false,
+            "indMobilidade":false,
+            "session":FAST_SessionId
+        }
+        
+        const response = await window.electron.getListaComHorariosParaDeletar(dados)
+        return response
+    }
+
+    //GET USER BY CNS OU CPF
     const getUserIDByCNS = async (documento) => {
         const dados = {
             "numeroCartaoSaude":documento,
@@ -139,6 +198,12 @@ export default function ConsultarAgendas() {
     }
     
     const verificarHorariosDoDia = async () => {
+
+        if (profissionalId == "") {
+            alert("Selecione um profissional")
+            return
+        }
+
         console.log("Verificando horarios do dia " + data_selecionada)
         const dados = {
             "datConsulta": data_selecionada,
@@ -287,25 +352,43 @@ export default function ConsultarAgendas() {
                     {/* parte de cima do bloco */}
                     <div className="horarioHeader">
 
-                        {/* Horas, todo bloco vai ter, independente */}
-                        <p id='horaConsulta' style={{ margin: 2 }}>{horario.hora}</p>
+            {/* Horas */}
+            <p id="horaConsulta" style={{ margin: 2 }}>
+                {horario.hora}
+            </p>
 
-                        {/* Usuario na frente da hora */}
-                        {horario.usuario 
-                        ? ( <p className="titulosBranco">{horario.usuario}</p>) 
-                        : horario.tipo ? (<p className="vagaBloqueada">{"Vaga bloqueada"}</p>) 
-                        : (
-                            <input
-                            value={cnsParaAgendar[horario.seqAgenda] || ""}
-                            onChange={(e) => {
-                                setCnsParaAgendar((prev) => ({
-                                    ...prev,
-                                    [horario.seqAgenda]: e.target.value,
-                                }))}
-                            }
-                            />
-                        )}
-                    </div>
+            {/* Usuario / bloqueio / input */}
+            {horario.usuario ? (
+                <p className="titulosBranco">{horario.usuario}</p>
+            ) : horario.tipo ? (
+                <p className="vagaBloqueada">Vaga bloqueada</p>
+            ) : (
+                <input
+                    value={cnsParaAgendar[horario.seqAgenda] || ""}
+                    onChange={(e) => {
+                        setCnsParaAgendar((prev) => ({
+                            ...prev,
+                            [horario.seqAgenda]: e.target.value,
+                        }));
+                    }}
+                />
+            )}
+
+            {/* Deletar */}
+            <button
+                className="buttonDelete"
+                onClick={() => {
+                    console.log("ENVIADO:", horario.seqAgenda, horario.codParametroAgenda)
+                    deletarAgendamentoUsuario(
+                        horario.codParametroAgenda,
+                        horario.seqAgenda,
+                        ); 
+                }}
+            >
+                <Trash2 size={18} />
+            </button>
+
+        </div>
 
                     <div className="horarioInfo">
                         <p>
