@@ -14,8 +14,8 @@ const baseUrl = "https://sistema.saudepublica.digital"
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width: 1350,
+    height: 900,
     show: false,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
@@ -298,7 +298,7 @@ app.whenReady().then(async () => {
         },
         body: JSON.stringify(dados)
       });
-      console.log("resposta MAIN: ", resposta)
+      console.log("resposta MAIN: ", await resposta.text())
 
       if (resposta.ok) {
       return {

@@ -103,6 +103,7 @@
 
 /* CARD DE CADA HORÁRIO */
 .horarioBlock {
+  position: relative;
   width: auto;
   min-height: 100px;
   height: auto;
@@ -118,7 +119,8 @@
   border-radius: 8px;
 
   padding: 12px;
-  margin: 7px;
+  margin: 7px 0px;
+
 
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 

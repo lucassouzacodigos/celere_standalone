@@ -1,11 +1,13 @@
-import "../assets/main.css"
-import { useEffect, useState } from 'react'
 
-import HomeButton from '../components/HomeButton'
-import ResultadosPesquisaModal from "../components/ResultadoPesquisaModal/ResultadosPesquisaModal"
+import { useEffect, useState } from "react"
+import "./modal.css"
+import { motion } from "motion/react"
 
 
-export default function Testandopesquisa () {
+import Spinner from "../Spinner"
+
+
+export default function ResultadosPesquisaModal({ busca, agendar, seqAgenda, codParametroAgenda, refresh }) {
 
     const [pesquisa, setPesquisa] = useState('')
     const [FAST_SessionId, setFAST_SessionId] = useState("")
@@ -13,27 +15,31 @@ export default function Testandopesquisa () {
 
 
 
-    //USE EFFECT DA PESQUISA
     useEffect(() => {
-    const timer = setTimeout(() => {
-        if (pesquisa.trim() !== "") {
-        pesquisar()
-        }
-    }, 1000);
+        const timer = setTimeout(() => {
+            if (busca.trim() !== "") {
+            pesquisar()
+            }
+        }, 1000);
 
-    return () => clearTimeout(timer);
-    }, [pesquisa]);
+        return () => clearTimeout(timer);
+    }, [busca]);
+
+
+
 
     const getDadosLogin = async () => {
         const FAST_SessionId = await window.electron.getFastMedicSession()
         setFAST_SessionId(FAST_SessionId)
     }
 
+
+
     const pesquisar = async () => {
         await getDadosLogin()
 
         const dados = {
-            "nomeUsuario":pesquisa,
+            "nomeUsuario":busca,
             "nomeMae":"",
             "dataNascimento":"",
             "tipoPesquisa":0,
@@ -52,18 +58,36 @@ export default function Testandopesquisa () {
         setResultadoPesquisa(response)
     }
 
+    const agendamentoIndividual = async (id) => {
+        await agendar(undefined, seqAgenda, codParametroAgenda, id)
+        refresh()
+    }
 
-    return(
-        <div className='container flex-center'>
 
-            <HomeButton />
 
-            <input value={pesquisa} type="text" className="general-input" onChange={(e) => setPesquisa(e.target.value)} />
-            <p>string pesquisa: {pesquisa}</p>
-            <div style={{display: "flex", flexDirection: "column", overflowY: "auto", width: "80%"}}>
+    return (
+        <motion.div className='pesquisaModalContainer'
+            initial={{
+                        opacity: 0,
+                        y: 80
+                    }}
+                    animate={{
+                        opacity: 1,
+                        y: 0
+                    }}
+                    transition={{
+                        duration: 0.3,
+                    }}
+                    exit={{
+                        opacity: 0,
+                        y: 80
+                    }}
+        >
+            
+            <div style={{display: "flex", flexDirection: "column", overflowY: "auto", width: "100%", backgroundColor: "white"}}>
                 {resultadoPesquisa.length > 0 ? 
                     resultadoPesquisa.map((user, index) => (
-                        <div style={{display: "flex", flexDirection: "row", width: "100%", justifyContent: "space-around"}}>
+                        <div key={index} className='linhaResultado' onClick={() => agendamentoIndividual(user.CodUsuario)}>
                             <p key={index}>{user.CodUsuario} |</p>
                             <p>{user.NomUsuario}</p>
                             <p>{user.DatNascimento}</p>
@@ -75,11 +99,9 @@ export default function Testandopesquisa () {
                         </div>
                     ))
                     :
-                    <p>sem resultados</p>
+                <Spinner />
                 }
             </div>
-
-            <ResultadosPesquisaModal />
-        </div>
+        </motion.div>
     )
 }
