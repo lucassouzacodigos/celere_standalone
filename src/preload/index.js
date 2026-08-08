@@ -30,6 +30,7 @@ if (process.contextIsolated) {
     limparCache: () => ipcRenderer.invoke('limpar-sessao'),
     getListaComHorariosParaDeletar: (dados) => ipcRenderer.invoke('get-lista-com-horarios-para-deletar', dados),
     deletarHorario: (dados) => ipcRenderer.invoke('deletar-agendamento-usuario', dados),
+    buscaRecepcao: (dados) => ipcRenderer.invoke('busca-recepcao', dados),
   }
   window.api = api
 }

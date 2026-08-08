@@ -9,6 +9,7 @@ import * as cheerio from 'cheerio'
 
 let dadoslogin
 let mainWindow
+const baseUrl = "https://sistema.saudepublica.digital"
 
 function createWindow() {
   // Create the browser window.
@@ -109,7 +110,7 @@ app.whenReady().then(async () => {
       }
     })
 
-    loginWindow.loadURL("https://sistema.saudepublica.digital/celere.embudasartes")
+    loginWindow.loadURL(`${baseUrl}/celere.embudasartes`)
 
     loginWindow.webContents.on("did-finish-load", () => {
       // [REDACTED]
@@ -181,7 +182,7 @@ app.whenReady().then(async () => {
   //da get em todas as agendas na unidade logada
   ipcMain.handle('consultar-profissionais-com-agendas', async () => {
     const ses = session.fromPartition("persist:saude-session");
-    const agendasURL = "https://sistema.saudepublica.digital/celere.embudasartes/Pep/Agenda/ConsultaAgendamentoInicialToMaster"
+    const agendasURL = `${baseUrl}/celere.embudasartes/Pep/Agenda/ConsultaAgendamentoInicialToMaster`
 
     const resposta = await ses.fetch(agendasURL)
     const html = await resposta.text()
@@ -209,7 +210,7 @@ app.whenReady().then(async () => {
   ipcMain.handle('verificar-horarios-do-dia', async (event, dados) => {
     console.log("IPCCAHAMDO")
     const ses = session.fromPartition("persist:saude-session");
-    const requestDiaEspeficico = "https://sistema.saudepublica.digital/celere.embudasartes/Pep/Agenda/ConsultaListaHorariosAgendaProfissional"
+    const requestDiaEspeficico = `${baseUrl}/celere.embudasartes/Pep/Agenda/ConsultaListaHorariosAgendaProfissional`
 
     const resposta = await ses.fetch(requestDiaEspeficico, {
       method: "POST",
@@ -255,7 +256,7 @@ app.whenReady().then(async () => {
     const ses = session.fromPartition("persist:saude-session");
 
     const cidadaoInfo = await ses.fetch(
-      "https://sistema.saudepublica.digital/celere.embudasartes/CompartilhadoUsuario/BuscaUsuarioPorCartaoPesquisaUsuario",
+      `${baseUrl}/celere.embudasartes/CompartilhadoUsuario/BuscaUsuarioPorCartaoPesquisaUsuario`,
       {
         method: "POST",
         headers: {
@@ -289,7 +290,7 @@ app.whenReady().then(async () => {
     console.log("MAIN RECEBEU:", dados.seqAgenda);
     // console.log(JSON.stringify(dados, null, 2));
 
-    const resposta = await ses.fetch("https://sistema.saudepublica.digital/celere.embudasartes/Pep/Agenda/MarcarConsulta", {
+    const resposta = await ses.fetch(`${baseUrl}/celere.embudasartes/Pep/Agenda/MarcarConsulta`, {
       method: "POST",
       headers: {
           "Content-Type": "application/json",
@@ -338,7 +339,7 @@ app.whenReady().then(async () => {
     const ses = session.fromPartition("persist:saude-session");
 
 
-    const resposta = await ses.fetch("https://sistema.saudepublica.digital/celere.embudasartes/Pep/Agenda/ListaHorariosAgendaProfissionalParaRemanejar" ,  {
+    const resposta = await ses.fetch(`${baseUrl}/celere.embudasartes/Pep/Agenda/ListaHorariosAgendaProfissionalParaRemanejar` ,  {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -362,7 +363,7 @@ app.whenReady().then(async () => {
   //EXCLUIR UM UNICO AGENDAMENTO
   ipcMain.handle("deletar-agendamento-usuario", async (event, dados) => {
     const ses = session.fromPartition("persist:saude-session");
-    const resposta = await ses.fetch("https://sistema.saudepublica.digital/celere.embudasartes/Pep/Agenda/ExcluirAgendamento",  {
+    const resposta = await ses.fetch(`${baseUrl}/celere.embudasartes/Pep/Agenda/ExcluirAgendamento`,  {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -371,6 +372,36 @@ app.whenReady().then(async () => {
       body: JSON.stringify(dados)
     })
     return await resposta.json()
+  })
+
+
+
+
+
+
+
+
+
+
+  // BUSCA NA BARRA DA RECEPCAO
+  ipcMain.handle('busca-recepcao', async (event, dados) => {
+    const ses = session.fromPartition("persist:saude-session");
+
+    const resposta = await ses.fetch(`${baseUrl}/celere.embudasartes/CompartilhadoUsuario/GridResultadoPesquisa`,  {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+        "Origin": "https://sistema.saudepublica.digital",
+        "Referer": "https://sistema.saudepublica.digital/celere.embudasartes/Pep/Recepcao/RecepcaoInicialToMaster"
+      },
+      body: JSON.stringify(dados)
+    })
+    const parsed = await resposta.text()
+    const parsed2 = JSON.parse(JSON.parse(parsed))
+    // console.log(parsed2)
+    // console.log(typeof parsed2)
+    return parsed2
   })
     
 
