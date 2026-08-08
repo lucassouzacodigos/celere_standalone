@@ -140,6 +140,7 @@ function Home() {
 				{/* <button onClick={getFastMedicSession}>sessionID</button> */}
 				{/* <button onClick={buscarProfissional}>Buscar Profissional</button> */}
 				<button onClick={() => navigate('/ConsultarAgendas')}>Agendar consultas</button>
+				<button onClick={() => navigate('/testandopesquisa')}>Barra de pesquisa WIP</button>
 
 
 				
