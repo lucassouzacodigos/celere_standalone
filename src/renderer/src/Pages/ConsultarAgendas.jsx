@@ -5,8 +5,9 @@ import casinha from "../assets/home.png"
 import HomeButton from "../components/HomeButton"
 import DatePicker from "react-datepicker"
 import 'react-datepicker/dist/react-datepicker.css'
-import { motion } from "motion/react"
+import { AnimatePresence, motion } from "motion/react"
 import { SaveAll, Trash2, UserSearch } from "lucide-react"
+import ResultadosPesquisaModal from "../components/ResultadoPesquisaModal/ResultadosPesquisaModal"
 
 
 export default function ConsultarAgendas() {
@@ -21,6 +22,7 @@ export default function ConsultarAgendas() {
     const [cidadaoID, setCidadaoID] = useState("")
     const [cnsParaAgendar, setCnsParaAgendar] = useState({})
     const [errosAgendamento, setErrosAgendamento] = useState({})
+    const [inputAtivo, setInputAtivo] = useState(null)
     
     const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -57,14 +59,14 @@ export default function ConsultarAgendas() {
     console.log(errosAgendamento)
 };
 
-    const agendarUsuarioPorCPFouCNS = async (documento, seqAgenda, codParametroAgenda) => {
+    const agendarUsuarioPorCPFouCNS = async (documento, seqAgenda, codParametroAgenda, directID) => {
 
 
         const IDCidadao = await getUserIDByCNS(documento)
         await getDadosLogin()
 
         const dados = {
-            "codUsuario": IDCidadao,  //ID do cidadao pra ser agendado
+            "codUsuario": directID || IDCidadao,  //ID do cidadao pra ser agendado
             "situacaoUsuario": 0,
             "codSiasusSms": tipoAgenda,  //codigo do tipo da agenda (clinica medica, odonto, etc)
             "codTipoAgendamento": "2",  // qual tipo de agendamento  2 = Eletiva Pre agendada
@@ -87,7 +89,7 @@ export default function ConsultarAgendas() {
             "session":FAST_SessionId
         }
 
-        if (IDCidadao == undefined) {
+        if (IDCidadao == undefined && !directID) {
             console.log("Erro ao agendar, CNS Nao cadastrado")
             setErrosAgendamento((prev) => ({
                 ...prev,
@@ -365,6 +367,8 @@ export default function ConsultarAgendas() {
             ) : (
                 <input
                     value={cnsParaAgendar[horario.seqAgenda] || ""}
+                    onFocus={() => {setInputAtivo(horario.seqAgenda)}}
+                    onBlur={() => {setTimeout(() => setInputAtivo(null), 100)}}
                     onChange={(e) => {
                         setCnsParaAgendar((prev) => ({
                             ...prev,
@@ -399,8 +403,23 @@ export default function ConsultarAgendas() {
                             <strong>Observação:</strong> {horario.observacao || "—"}
                         </p>
                     </div>
+                    {
+                        cnsParaAgendar[horario.seqAgenda] && !horario.usuario && inputAtivo === horario.seqAgenda &&
+                        <AnimatePresence>
+                            <ResultadosPesquisaModal 
+                                busca={cnsParaAgendar[horario.seqAgenda]}  
+                                seqAgenda={horario.seqAgenda} 
+                                codParametroAgenda={horario.codParametroAgenda} 
+                                agendar={agendarUsuarioPorCPFouCNS} 
+                                refresh={verificarHorariosDoDia}
+                            />
+                        </AnimatePresence>
+                    }
+
                 </motion.div>
+                
             )) || "Selecione o profissional e a data"}
+            
             </div>
             
             </div>
