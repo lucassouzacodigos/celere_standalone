@@ -163,6 +163,11 @@ app.whenReady().then(async () => {
     console.log(cookies)
   })
 
+  //GET VERSION
+  ipcMain.handle('get-version', async () => {
+    return app.getVersion()
+  })
+
   //BUSCA PROFISSIONAL
   ipcMain.handle('buscar-profissional', async (event, dados) => {
     const response = await buscarProfissional(dados)

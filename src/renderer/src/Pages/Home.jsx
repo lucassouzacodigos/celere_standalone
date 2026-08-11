@@ -3,9 +3,11 @@ import * as scripts from '../../../main/scripts/scripts.js'
 import { useNavigate } from 'react-router-dom'
 import HomeButton from '../components/HomeButton.jsx'
 import Spinner from '../components/Spinner.jsx'
+import splash from '../assets/celeresplash2.gif'
 
 
 function Home() {
+
 	const ipcHandle = () => window.electron.ipcRenderer.send('ping')
 	const navigate = useNavigate()
 	
@@ -15,6 +17,7 @@ function Home() {
 	const [ocupacao, setOcupacao] = useState()
 	const [unidade, setUnidade] = useState()
 	const [subModulo, setSubModulo] = useState()
+	const [version, setVersion] = useState()
 
 
 	const [FAST_SessionId, setFAST_SessionId] = useState("")
@@ -92,7 +95,6 @@ function Home() {
 	
 	
 	useEffect(() => {
-		getDadosLogin()
 		window.electron.sendDadosUnidade(async(dados) => {
 			await getDadosLogin()
 			const [nome, ocupacao] = dados[0]
@@ -105,6 +107,11 @@ function Home() {
 			setOcupacao(ocupacao.trim())
 			setUnidade(unidade.trim())
 		})
+		async function getVersion() {
+			let version = await window.electron.getVersion()
+			setVersion(version)
+		}
+		getVersion()
 	}, [ocupacao])
 	
 	
@@ -117,6 +124,8 @@ function Home() {
 			<HomeButton/>
 			
 			<div className="mainmenu flex-center">
+
+
 
 				{dados ? 
 					<div className="infoBox flex-center">
@@ -131,6 +140,8 @@ function Home() {
 					<p style={{marginLeft: "10px"}}>Aguardando Login</p>
 					</div>
 				}
+
+				<img src={splash} style={{width: 300, height: "auto", position:"absolute", top: "50%", left: "50%", transform: "translate(-50%, -70%)"}}></img>
 			
 				<button onClick={openLoginPage}>{dados? "Atualizar Login" : "Login"}</button>
 				{/* <button onClick={scripts.consoleLogCookies}>Cookies</button>
@@ -141,6 +152,14 @@ function Home() {
 				<button onClick={buscarProfissional}>Buscar Profissional</button>
 				<button onClick={() => navigate('/testandopesquisa')}>Barra de pesquisa WIP</button> */}
 				<button onClick={() => navigate('/ConsultarAgendas')}>Agendar consultas</button>
+
+				<div className='patchNotes'>
+
+					<p>Notas da Versão</p>
+					<p>v{version}_public</p>
+					<p style={{textAlign:"start"}}>Agora é possivel agendar bloqueios administrativos diretamente do aplicativo</p>
+					
+				</div>
 
 
 				
