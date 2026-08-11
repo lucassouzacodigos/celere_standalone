@@ -133,14 +133,14 @@ function Home() {
 				}
 			
 				<button onClick={openLoginPage}>{dados? "Atualizar Login" : "Login"}</button>
-				{/* <button onClick={scripts.consoleLogCookies}>Cookies</button> */}
-				{/* <button onClick={getDadosLogin}>Atualizar Sessao</button> */}
-				{/* <button onClick={scripts.teste}>aaaaaaa</button> */}
-				{/* <button onClick={() => console.log(dados)}>Dados Login</button> */}
-				{/* <button onClick={getFastMedicSession}>sessionID</button> */}
-				{/* <button onClick={buscarProfissional}>Buscar Profissional</button> */}
+				{/* <button onClick={scripts.consoleLogCookies}>Cookies</button>
+				<button onClick={getDadosLogin}>Atualizar Sessao</button>
+				<button onClick={scripts.teste}>aaaaaaa</button>
+				<button onClick={() => console.log(dados)}>Dados Login</button>
+				<button onClick={getFastMedicSession}>sessionID</button>
+				<button onClick={buscarProfissional}>Buscar Profissional</button>
+				<button onClick={() => navigate('/testandopesquisa')}>Barra de pesquisa WIP</button> */}
 				<button onClick={() => navigate('/ConsultarAgendas')}>Agendar consultas</button>
-				<button onClick={() => navigate('/testandopesquisa')}>Barra de pesquisa WIP</button>
 
 
 				

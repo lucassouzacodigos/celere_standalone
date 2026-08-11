@@ -208,7 +208,6 @@ app.whenReady().then(async () => {
 
   //Request pra verificar horarios com agendamentos de um dia especifico
   ipcMain.handle('verificar-horarios-do-dia', async (event, dados) => {
-    console.log("IPCCAHAMDO")
     const ses = session.fromPartition("persist:saude-session");
     const requestDiaEspeficico = `${baseUrl}/celere.embudasartes/Pep/Agenda/ConsultaListaHorariosAgendaProfissional`
 
@@ -246,7 +245,7 @@ app.whenReady().then(async () => {
         codParametroAgenda: $(tr).attr("data-codparametroagenda"),
       })
     })
-    console.log(horarios[0])
+    // console.log(horarios[0])
     return horarios
   })
 
@@ -335,7 +334,6 @@ app.whenReady().then(async () => {
 
   //GET LISTA COM HORARIOS PARA DELETAR
   ipcMain.handle("get-lista-com-horarios-para-deletar", async (event, dados) => {
-    console.log("IPCCHAMADO")
     const ses = session.fromPartition("persist:saude-session");
 
 
@@ -351,7 +349,7 @@ app.whenReady().then(async () => {
     const parsed = await resposta.json()
     const parsed2 = JSON.parse(parsed)
     
-    console.log(parsed2.Resultado)
+    // console.log("parsed2.Resultado: ", parsed2.Resultado)
     return parsed2.Resultado
 
 
@@ -372,6 +370,69 @@ app.whenReady().then(async () => {
       body: JSON.stringify(dados)
     })
     return await resposta.json()
+  })
+
+
+
+  // GET OPÇOES DE BLOQUEIO
+  ipcMain.handle("get-opcoes-bloqueio", async (event, dados) => {
+    const ses = session.fromPartition("persist:saude-session")
+
+    const response = await ses.fetch(
+        `${baseUrl}/celere.embudasartes/Pep/Agenda/ListaHorariosAgendaProfissional`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-Requested-With": "XMLHttpRequest",
+                "Referer":
+                    "https://sistema.saudepublica.digital/celere.embudasartes/Pep/Agenda/AgendamentoAdmInicialToMaster"
+            },
+            body: JSON.stringify(dados)
+        }
+    )
+
+    const $ = cheerio.load(await response.text())
+
+    let options = []
+
+    $("[id^='Agendamento_TipoAgendamento']").each((_, select) => {
+
+        const currentOptions = $(select)
+            .find("option")
+            .map((_, option) => ({
+                value: $(option).attr("value") ?? "",
+                text: $(option).text().trim()
+            }))
+            .get()
+
+        if (currentOptions.length > 1) {
+            options = currentOptions
+            return false
+        }
+    })
+
+    return options
+})
+
+
+  //FAZ UM BLOQUEIO ADMINISTRATIVO DE UM HORARIO
+  ipcMain.handle("bloqueio-adm-unico", async (event, dados) => {
+    const ses = session.fromPartition("persist:saude-session");
+
+    // console.log(dados)
+    // console.log(JSON.stringify(dados))
+    
+    const response = await ses.fetch(`${baseUrl}/celere.embudasartes/Pep/Agenda/AgendarAdm`,  {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+        "Referer": "https://sistema.saudepublica.digital/celere.embudasartes/Pep/Agenda/AgendamentoAdmInicialToMaster"
+      },
+      body: JSON.stringify(dados)
+    })
+    
   })
 
 
