@@ -31,6 +31,8 @@ if (process.contextIsolated) {
     getListaComHorariosParaDeletar: (dados) => ipcRenderer.invoke('get-lista-com-horarios-para-deletar', dados),
     deletarHorario: (dados) => ipcRenderer.invoke('deletar-agendamento-usuario', dados),
     buscaRecepcao: (dados) => ipcRenderer.invoke('busca-recepcao', dados),
+    getOpcoesBloqueio: (dados) => ipcRenderer.invoke('get-opcoes-bloqueio', dados),
+    bloqueioADMUnico: (dados) => ipcRenderer.invoke('bloqueio-adm-unico', dados),
   }
   window.api = api
 }

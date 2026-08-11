@@ -6,7 +6,7 @@ import HomeButton from "../components/HomeButton"
 import DatePicker from "react-datepicker"
 import 'react-datepicker/dist/react-datepicker.css'
 import { AnimatePresence, motion } from "motion/react"
-import { SaveAll, Trash2, UserSearch } from "lucide-react"
+import { Lock, SaveAll, Trash2, UserSearch, LockKeyhole } from "lucide-react"
 import ResultadosPesquisaModal from "../components/ResultadoPesquisaModal/ResultadosPesquisaModal"
 
 
@@ -23,6 +23,8 @@ export default function ConsultarAgendas() {
     const [cnsParaAgendar, setCnsParaAgendar] = useState({})
     const [errosAgendamento, setErrosAgendamento] = useState({})
     const [inputAtivo, setInputAtivo] = useState(null)
+    const [opcoesBloqueio , setOpcoesBloqueio] = useState([])
+    const [idBloqueio, setIdBloqueio] = useState(10)
     
     const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -106,6 +108,7 @@ export default function ConsultarAgendas() {
 
     }
 
+
     const deletarAgendamentoUsuario = async (codParametroAgenda, seqAgendaDelete) => {
 
         await getDadosLogin()
@@ -152,7 +155,7 @@ export default function ConsultarAgendas() {
             "codProfissional":profissionalId,
             "codSiasusSms":tipoAgenda,
             "dataSelecionada":data_selecionada,
-            "tipVisualizacao":2,
+            "tipVisualizacao":1,
             "indTeleatendimento":false,
             "indMobilidade":false,
             "session":FAST_SessionId
@@ -198,6 +201,55 @@ export default function ConsultarAgendas() {
         const dados = await window.electron.consultarProfissionaisComAgendas()
         setProfissionais(dados)
     }
+
+
+    //GET OPCOES BLOQUEIO 
+    const getOpcoesBloqueio = async () => {
+
+        //MONTA A DATA EM FORMATO ISO, JA QUE O END POINT PEDE
+        const [dia, mes, ano] = data_selecionada.split("/");
+        const dataISO = new Date(
+        `${ano}-${mes}-${dia}T00:00:00-03:00`
+        ).toISOString();
+
+        const dados = {
+            "datConsulta":dataISO,
+            "codProfissional":profissionalId,
+            "codSiasusSms":tipoAgenda,
+            "tipVisualizacao":1,
+            "codAcaoOrigem":"32",
+            "codGrupoEspecialidade":idCBOProfissional,
+            "indTeleatendimento":false,
+            "session":FAST_SessionId
+        }
+
+        const response = await window.electron.getOpcoesBloqueio(dados)
+        console.log(response)
+
+        setOpcoesBloqueio(response)
+    }
+
+    //BLOQUEAR ADM UM HORARIO
+    const bloqueioADMUnico = async (codParametroAgenda, seqAgenda, codTipoAgendamento) => {
+        
+        const dados =
+        [
+            {
+                "CodParametroAgenda":codParametroAgenda,
+                "SeqAgenda":seqAgenda,
+                "NumAnoCompetencia":new Date().getFullYear(),  // bruh; o request pede o ano por algum motivo
+                "CodTipoAgendamento": codTipoAgendamento
+            }
+        ]
+
+        await window.electron.bloqueioADMUnico(dados)
+
+        await verificarHorariosDoDia()
+    }
+
+
+
+
     
     const verificarHorariosDoDia = async () => {
 
@@ -220,9 +272,16 @@ export default function ConsultarAgendas() {
         }
         
         const resposta = await window.electron.verificarHorariosDoDia(dados)
-        
+
+        if (opcoesBloqueio.length === 0) {
+            await getOpcoesBloqueio() // atualiza os bloqueios disponiveis
+        }
+
         setHorarios(resposta)
     }
+
+
+
     
     useEffect(() => {
         async function carregar() {
@@ -365,18 +424,51 @@ export default function ConsultarAgendas() {
             ) : horario.tipo ? (
                 <p className="vagaBloqueada">Vaga bloqueada</p>
             ) : (
-                <input
-                    value={cnsParaAgendar[horario.seqAgenda] || ""}
-                    onFocus={() => {setInputAtivo(horario.seqAgenda)}}
-                    onBlur={() => {setTimeout(() => setInputAtivo(null), 100)}}
-                    onChange={(e) => {
-                        setCnsParaAgendar((prev) => ({
-                            ...prev,
-                            [horario.seqAgenda]: e.target.value,
-                        }));
-                    }}
-                />
+                <>
+                    <input
+                        value={cnsParaAgendar[horario.seqAgenda] || ""}
+                        onFocus={() => {setInputAtivo(horario.seqAgenda)}}
+                        onBlur={() => {setTimeout(() => setInputAtivo(null), 100)}}
+                        onChange={(e) => {
+                            setCnsParaAgendar((prev) => ({
+                                ...prev,
+                                [horario.seqAgenda]: e.target.value,
+                            }));
+                        }}
+                    />
+
+                    {/* BLOQUEIO ADM */}
+                    <div className="bloqueio">
+                        <label className="lockButton">
+                            <LockKeyhole size={18} />
+
+                            <select
+                                onChange={(e) =>
+                                    bloqueioADMUnico(
+                                        horario.codParametroAgenda,
+                                        horario.seqAgenda,
+                                        e.target.value
+                                    )
+                                }
+                            >
+                                {opcoesBloqueio.map((bloqueio) => (
+                                    <option
+                                        key={bloqueio.value}
+                                        value={bloqueio.value}
+                                    >
+                                        {bloqueio.text}
+                                    </option>
+                                ))}
+                            </select>
+                        </label>
+                    </div>
+                </>
+
+                
             )}
+
+
+            
 
             {/* Deletar */}
             <button
@@ -391,6 +483,18 @@ export default function ConsultarAgendas() {
             >
                 <Trash2 size={18} />
             </button>
+
+
+            {/* BLOQUEIO ADMINISTRATIVO */}
+            {/* <div className="bloqueio">
+                <select style={{width: "200px"}} onChange={(e) => bloqueioADMUnico(horario.codParametroAgenda, horario.seqAgenda, e.target.value)}>
+                    {opcoesBloqueio.map((bloqueio) => (
+                        <option key={bloqueio.value} value={bloqueio.value}>{bloqueio.text}</option>
+                    ))}
+                </select>
+                <LockKeyhole size={18}/>
+            </div> */}
+
 
         </div>
 
@@ -415,10 +519,11 @@ export default function ConsultarAgendas() {
                             />
                         </AnimatePresence>
                     }
-
                 </motion.div>
                 
             )) || "Selecione o profissional e a data"}
+                        
+
             
             </div>
             

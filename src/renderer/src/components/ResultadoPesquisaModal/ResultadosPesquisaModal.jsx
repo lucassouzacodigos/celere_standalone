@@ -88,7 +88,7 @@ export default function ResultadosPesquisaModal({ busca, agendar, seqAgenda, cod
                 {resultadoPesquisa.length > 0 ? 
                     resultadoPesquisa.map((user, index) => (
                         <div key={index} className='linhaResultado' onClick={() => agendamentoIndividual(user.CodUsuario)}>
-                            <p key={index}>{user.CodUsuario} |</p>
+                            <p>{user.CodUsuario} |</p>
                             <p>{user.NomUsuario}</p>
                             <p>{user.DatNascimento}</p>
                             <p>{user.DscIdade}</p>
