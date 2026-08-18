@@ -34,6 +34,7 @@ if (process.contextIsolated) {
     getOpcoesBloqueio: (dados) => ipcRenderer.invoke('get-opcoes-bloqueio', dados),
     bloqueioADMUnico: (dados) => ipcRenderer.invoke('bloqueio-adm-unico', dados),
     getVersion: () => ipcRenderer.invoke('get-version'),
+    getDadosFormatados: () => ipcRenderer.invoke('get-dados-formatados'),
   }
   window.api = api
 }

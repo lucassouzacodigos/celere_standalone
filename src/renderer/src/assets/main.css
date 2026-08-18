@@ -359,6 +359,8 @@
 
 
 
+
+
 .selectProfissional{
   width: 99%;
 }
@@ -668,6 +670,12 @@ button:disabled:hover {
     opacity: 0;
 
     cursor: pointer;
+}
+
+.analyticsBtn{
+  background-color: red;
+  background: linear-gradient(from right, #a5ffad, #666);
+  
 }
 
 .patchNotes{

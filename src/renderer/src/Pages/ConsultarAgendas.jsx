@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom"
+import { data, useNavigate } from "react-router-dom"
 import "../assets/main.css"
 import { useEffect, useState } from 'react'
 import casinha from "../assets/home.png"
@@ -8,6 +8,7 @@ import 'react-datepicker/dist/react-datepicker.css'
 import { AnimatePresence, motion } from "motion/react"
 import { Lock, SaveAll, Trash2, UserSearch, LockKeyhole } from "lucide-react"
 import ResultadosPesquisaModal from "../components/ResultadoPesquisaModal/ResultadosPesquisaModal"
+import { addRegister } from "../../services/dbcursor"
 
 
 export default function ConsultarAgendas() {
@@ -25,6 +26,7 @@ export default function ConsultarAgendas() {
     const [inputAtivo, setInputAtivo] = useState(null)
     const [opcoesBloqueio , setOpcoesBloqueio] = useState([])
     const [idBloqueio, setIdBloqueio] = useState(10)
+    const [dadosFormatados, setDadosFormatados] = useState({})
     
     const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -103,7 +105,10 @@ export default function ConsultarAgendas() {
         const response = await window.electron.agendarUsuarioPorCPFouCNS(dados)
 
         if (response.sucesso) {
-            console.log("Agendado com sucesso")
+            console.log("Agendado com sucesso, Adicionado ao log")
+            //log
+            const nomeProfissionalDonoDaAgenda = profissionais.find(agenda => agenda.value.split(",")[0] == profissionalId).texto.split(" - ")[0].trim()
+            addRegister(dadosFormatados.unidade, dadosFormatados?.nome, nomeProfissionalDonoDaAgenda, "Agendamento")
         }
 
     }
@@ -142,6 +147,11 @@ export default function ConsultarAgendas() {
         }
 
         const deletarHorario = await window.electron.deletarHorario(dados)
+
+        //log
+        const nomeProfissionalDonoDaAgenda = profissionais.find(agenda => agenda.value.split(",")[0] == profissionalId).texto.split(" - ")[0].trim()
+        addRegister(dadosFormatados.unidade, dadosFormatados?.nome, nomeProfissionalDonoDaAgenda, "Cancelamento")
+
         
         await verificarHorariosDoDia()
     }
@@ -243,6 +253,9 @@ export default function ConsultarAgendas() {
         ]
 
         await window.electron.bloqueioADMUnico(dados)
+        //log
+        const nomeProfissionalDonoDaAgenda = profissionais.find(agenda => agenda.value.split(",")[0] == profissionalId).texto.split(" - ")[0].trim()
+        addRegister(dadosFormatados.unidade, dadosFormatados?.nome, nomeProfissionalDonoDaAgenda, "Bloqueio")
 
         await verificarHorariosDoDia()
     }
@@ -290,6 +303,8 @@ export default function ConsultarAgendas() {
             await window.electron.consultarProfissionaisComAgendas();
             
             setProfissionais(dados);
+            const dadosFormatados = await window.electron.getDadosFormatados()
+            setDadosFormatados(dadosFormatados)
         }
         
         carregar();
@@ -483,17 +498,6 @@ export default function ConsultarAgendas() {
             >
                 <Trash2 size={18} />
             </button>
-
-
-            {/* BLOQUEIO ADMINISTRATIVO */}
-            {/* <div className="bloqueio">
-                <select style={{width: "200px"}} onChange={(e) => bloqueioADMUnico(horario.codParametroAgenda, horario.seqAgenda, e.target.value)}>
-                    {opcoesBloqueio.map((bloqueio) => (
-                        <option key={bloqueio.value} value={bloqueio.value}>{bloqueio.text}</option>
-                    ))}
-                </select>
-                <LockKeyhole size={18}/>
-            </div> */}
 
 
         </div>

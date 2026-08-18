@@ -106,6 +106,7 @@ function Home() {
 			setNome(nome.trim())
 			setOcupacao(ocupacao.trim())
 			setUnidade(unidade.trim())
+
 		})
 		async function getVersion() {
 			let version = await window.electron.getVersion()
@@ -143,7 +144,6 @@ function Home() {
 
 				<img src={splash} style={{width: 300, height: "auto", position:"absolute", top: "50%", left: "50%", transform: "translate(-50%, -70%)"}}></img>
 			
-				<button onClick={openLoginPage}>{dados? "Atualizar Login" : "Login"}</button>
 				{/* <button onClick={scripts.consoleLogCookies}>Cookies</button>
 				<button onClick={getDadosLogin}>Atualizar Sessao</button>
 				<button onClick={scripts.teste}>aaaaaaa</button>
@@ -151,7 +151,9 @@ function Home() {
 				<button onClick={getFastMedicSession}>sessionID</button>
 				<button onClick={buscarProfissional}>Buscar Profissional</button>
 				<button onClick={() => navigate('/testandopesquisa')}>Barra de pesquisa WIP</button> */}
+				<button onClick={openLoginPage}>{dados? "Atualizar Login" : "Login"}</button>
 				<button onClick={() => navigate('/ConsultarAgendas')}>Agendar consultas</button>
+				{nome?.toLowerCase().includes("celere") && <button className='analyticsBtn' onClick={() => navigate('/Analytics')}>Relatorios</button>}
 
 				<div className='patchNotes'>
 

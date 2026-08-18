@@ -9,6 +9,8 @@ import * as cheerio from 'cheerio'
 
 let dadoslogin
 let mainWindow
+let dadosLoginFormatados
+
 const baseUrl = "https://sistema.saudepublica.digital"
 
 function createWindow() {
@@ -77,6 +79,11 @@ app.whenReady().then(async () => {
     return dadoslogin
   })
 
+  ipcMain.handle('get-dados-formatados', () => {
+    return dadosLoginFormatados
+  })
+
+
 
   //ENvia as info após o login
   async function sendDadosUnidade(dados){
@@ -144,6 +151,21 @@ app.whenReady().then(async () => {
 
           await sendDadosUnidade(textos)
 
+
+          //formatando dados apos o login para salvar na variavel global aqui no main
+          const [nome, ocupacao] = textos[0]
+          .replace("Bem vindo ", "")
+          .split(":")
+          const unidade = textos[1].replace("Estabelecimento: ", "")
+
+          dadosLoginFormatados = {
+            nome: nome.trim(),
+            ocupacao: ocupacao.trim(),
+            unidade: unidade.trim()
+          }
+          //- --- - -- - --- - -- - --- - -- - --- - -- 
+
+
           setTimeout(() => {
             loginWindow.close()
           }, 500)
@@ -196,8 +218,8 @@ app.whenReady().then(async () => {
 
     const select =  $("#ConsultaAgendamento_ControlComboProfissional")
 
-    console.log(select.html())
-    console.log(select.attr("id"))
+    // console.log(select.html())
+    // console.log(select.attr("id"))
     
     const profissionais = [];
 
@@ -207,6 +229,8 @@ app.whenReady().then(async () => {
         texto: $(option).text().trim(),
       });
     });
+
+    // console.log(profissionais)
 
     return profissionais;
   })
