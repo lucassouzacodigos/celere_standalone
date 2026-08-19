@@ -1,101 +1,118 @@
-import { useNavigate } from "react-router-dom"
 import HomeButton from "../components/HomeButton"
-import { addRegister, getAllRegisters } from "../../services/dbcursor"
+import { getAllRegisters } from "../../services/dbcursor"
 import { useEffect, useState } from "react"
+import { Ban, CalendarDays, CircleX, FileText } from "lucide-react"
 
+const actionModes = [
+    { value: "Agendamento", label: "Agendamentos", icon: CalendarDays },
+    { value: "Bloqueio", label: "Bloqueios", icon: Ban },
+    { value: "Cancelamento", label: "Cancelamento", icon: CircleX },
+]
 
+function getRegisterDate(register) {
+    if (!register.data) return 0
 
+    const [day, month, year] = register.data.split("/")
+    const [hour = 0, minute = 0] = (register.hora || "00:00").split(":")
+
+    return new Date(year, month - 1, day, hour, minute).getTime()
+}
 
 export default function Analytics () {
-
-    const navigate = useNavigate()
-    const [userData, setUserData] = useState({})
     const [registers, setRegisters] = useState([])
-
-
-
-//TESTE
-    // const handleAgendamento = async () => {
-    //     console.log("adicionando registro")
-    //     console.log(userData.nome)
-    //     console.log(userData.unidade)
-    //     if(!userData) return console.log("erro ao registrar log de agendamento")
-    //     await addRegister(userData?.unidade, userData?.nome)
-    // }  
-
+    const [selectedAction, setSelectedAction] = useState("Agendamento")
 
     useEffect(() => {
-        async function getDadosFormatados(){
-            const dados = await window.electron.getDadosFormatados()
-            console.log(dados)
-            setUserData(dados)
-
-        }
-
         async function baixarLogs(){
             const dados = await getAllRegisters()
             setRegisters(dados)
-            console.log(dados)
         }
-        getDadosFormatados()
+
         baixarLogs()
-        
     }, [])
 
+    const selectedMode = actionModes.find((mode) => mode.value === selectedAction)
+    const visibleRegisters = registers
+        .filter((item) => item.tipoAcao === selectedAction)
+        .sort((first, second) => getRegisterDate(second) - getRegisterDate(first))
 
     return(
-
-        <div className="container">
+        <div className="container analyticsPage">
             <HomeButton/>
 
-
-
-{/* apenas agradeça GPT pelo .sort  */}
-            <div style={{display: "flex", flexDirection: "column", overflowY: "auto"}}>
-                {registers.length > 0 && registers
-                    .filter((item) => item.tipoAcao == "Agendamento" && item.hora)
-                    .sort((a, b) => {
-                    const [diaA, mesA, anoA] = a.data.split("/");
-                    const [horaA, minutoA] = a.hora.split(":");
-
-                    const [diaB, mesB, anoB] = b.data.split("/");
-                    const [horaB, minutoB] = b.hora.split(":");
-
-                    const dataA = new Date(
-                        anoA,
-                        mesA - 1,
-                        diaA,
-                        horaA,
-                        minutoA
-                    );
-
-                    const dataB = new Date(
-                        anoB,
-                        mesB - 1,
-                        diaB,
-                        horaB,
-                        minutoB
-                    );
-
-                    return dataB - dataA;
-                })
-                    .map((item, index) => (
-                    <div key={index} style={{marginBottom: "10px", backgroundColor: "grey", padding: 10, borderRadius: 10}}>
-                        <p>Quem fez: {item.quemAgendou}</p>
-                        <p>Agendado para: {item.agendadoPara}</p>
-                        <p>Unidade: {item.unidade}</p>
-                        <p>Data: {item.data ?? ''}</p>
-                        <p>Hora: {item.hora ?? ''}</p>
-                        <p>Tipo de ação: {item.tipoAcao ?? ''}</p>
+            <main className="analyticsContent">
+                <header className="analyticsHeader">
+                    <div>
+                        <span className="analyticsEyebrow">Central de registros</span>
+                        <h1>Relatórios de atividade</h1>
+                        <p>Consulte os eventos registrados por unidade e período.</p>
                     </div>
-                ))}
+                    <div className="analyticsCount" aria-live="polite">
+                        <strong>{visibleRegisters.length}</strong>
+                        <span>registro{visibleRegisters.length === 1 ? "" : "s"}</span>
+                    </div>
+                </header>
 
+                <nav className="analyticsTabs" aria-label="Filtrar registros por tipo de ação">
+                    {actionModes.map(({ value, label, icon: Icon }) => (
+                        <button
+                            key={value}
+                            className={selectedAction === value ? "analyticsTab active" : "analyticsTab"}
+                            type="button"
+                            aria-pressed={selectedAction === value}
+                            onClick={() => setSelectedAction(value)}
+                        >
+                            <Icon size={17} strokeWidth={2.2} />
+                            <span>{label}</span>
+                        </button>
+                    ))}
+                </nav>
 
-            </div>
-
+                <section className="analyticsList" aria-live="polite">
+                    {visibleRegisters.length > 0 ? visibleRegisters.map((item, index) => (
+                        <article
+                            className="analyticsRow"
+                            key={`${item.data}-${item.hora}-${item.unidade}-${index}`}
+                            tabIndex="0"
+                        >
+                            <div className="analyticsRowAccent" />
+                            <div className="analyticsRowSummary">
+                                <div className="analyticsRowDate">
+                                    <strong>{item.hora || "--:--"}</strong>
+                                    <span>{item.data || "Data não informada"}</span>
+                                </div>
+                                <div className="analyticsRowPerson">
+                                    <strong>{item.agendadoPara || "Pessoa não informada"}</strong>
+                                    <span>{selectedMode?.label}</span>
+                                </div>
+                                <div className="analyticsRowUnit">
+                                    <span>Unidade</span>
+                                    <strong>{item.unidade || "Não informada"}</strong>
+                                </div>
+                                <span className="analyticsExpandHint" aria-hidden="true">+</span>
+                            </div>
+                            <div className="analyticsRowDetails">
+                                <dl className="analyticsDetails">
+                                <div>
+                                    <dt>Unidade</dt>
+                                    <dd>{item.unidade || "Não informada"}</dd>
+                                </div>
+                                <div>
+                                    <dt>Responsável</dt>
+                                    <dd>{item.quemAgendou || "Não informado"}</dd>
+                                </div>
+                                </dl>
+                            </div>
+                        </article>
+                    )) : (
+                        <div className="analyticsEmpty">
+                            <FileText size={30} strokeWidth={1.6} />
+                            <h2>Nenhum registro encontrado</h2>
+                            <p>Não existem {selectedMode?.label.toLowerCase()} registrados até o momento.</p>
+                        </div>
+                    )}
+                </section>
+            </main>
         </div>
-
-
-
     )
 }

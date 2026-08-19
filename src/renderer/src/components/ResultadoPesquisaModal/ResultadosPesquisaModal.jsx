@@ -9,7 +9,6 @@ import Spinner from "../Spinner"
 
 export default function ResultadosPesquisaModal({ busca, agendar, seqAgenda, codParametroAgenda, refresh }) {
 
-    const [pesquisa, setPesquisa] = useState('')
     const [FAST_SessionId, setFAST_SessionId] = useState("")
     const [resultadoPesquisa, setResultadoPesquisa] = useState([])
 
@@ -84,19 +83,28 @@ export default function ResultadosPesquisaModal({ busca, agendar, seqAgenda, cod
                     }}
         >
             
-            <div style={{display: "flex", flexDirection: "column", overflowY: "auto", width: "100%", backgroundColor: "white"}}>
+            <div className="resultadosPesquisaLista">
                 {resultadoPesquisa.length > 0 ? 
                     resultadoPesquisa.map((user, index) => (
-                        <div key={index} className='linhaResultado' onClick={() => agendamentoIndividual(user.CodUsuario)}>
-                            <p>{user.CodUsuario} |</p>
-                            <p>{user.NomUsuario}</p>
-                            <p>{user.DatNascimento}</p>
-                            <p>{user.DscIdade}</p>
-                            <p>{user.DscLogradouro}</p>
-                            <p>{user.IdadeAnos}</p>
-                            <p>{user.NumCartaoSaude}</p>
-                            <p>{user.NumCPF}</p>
-                        </div>
+                        <button
+                            key={index}
+                            type="button"
+                            className="linhaResultado"
+                            onClick={() => agendamentoIndividual(user.CodUsuario)}
+                        >
+                            <span className="resultadoResumo">
+                                <span className="resultadoCodigo">#{user.CodUsuario}</span>
+                                <span className="resultadoNome">{user.NomUsuario || "Nome não informado"}</span>
+                                <span className="resultadoNascimento">{user.DatNascimento || "Nascimento não informado"}</span>
+                                <span className="resultadoAcao">Selecionar</span>
+                            </span>
+                            <span className="resultadoDetalhes">
+                                <span><small>Idade</small>{user.DscIdade || user.IdadeAnos || "Não informada"}</span>
+                                <span><small>Endereço</small>{user.DscLogradouro || "Não informado"}</span>
+                                <span><small>Cartão SUS</small>{user.NumCartaoSaude || "Não informado"}</span>
+                                <span><small>CPF</small>{user.NumCPF || "Não informado"}</span>
+                            </span>
+                        </button>
                     ))
                     :
                 <Spinner />
