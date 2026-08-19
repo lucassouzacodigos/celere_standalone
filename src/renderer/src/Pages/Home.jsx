@@ -159,7 +159,7 @@ function Home() {
 
 					<p>Notas da Versão</p>
 					<p>v{version}_public</p>
-					<p style={{textAlign:"start"}}>Agora é possivel agendar bloqueios administrativos diretamente do aplicativo</p>
+					<p style={{textAlign:"start"}}>Aba de Relatorios foi adicionada</p>
 					
 				</div>
 
