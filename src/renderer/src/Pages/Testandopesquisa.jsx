@@ -10,6 +10,7 @@ export default function Testandopesquisa () {
     const [pesquisa, setPesquisa] = useState('')
     const [FAST_SessionId, setFAST_SessionId] = useState("")
     const [resultadoPesquisa, setResultadoPesquisa] = useState([])
+    const [textoPdf, setTextoPdf] = useState("")
 
 
 
@@ -53,6 +54,21 @@ export default function Testandopesquisa () {
     }
 
 
+        const extrairTextoPdf = async (e) => {
+            const file = e.target.files[0]
+
+            if (!file) return
+
+            const arrayBuffer = await file.arrayBuffer()
+            const uint8Array = new Uint8Array(arrayBuffer)
+
+            const resultado = await window.electron.extrairTextoPdf(uint8Array)
+
+            setTextoPdf(resultado.texto)
+            console.log(resultado.texto)
+        }
+
+
     return(
         <div className='container flex-center'>
 
@@ -77,6 +93,8 @@ export default function Testandopesquisa () {
                     :
                     <p>sem resultados</p>
                 }
+                <input type="file" accept=".pdf,application/pdf" onChange={extrairTextoPdf}></input>
+                <textarea style={{minHeight:500}}>{textoPdf}</textarea>
             </div>
 
             <ResultadosPesquisaModal />

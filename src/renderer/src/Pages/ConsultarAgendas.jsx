@@ -1,6 +1,6 @@
 import { data, useNavigate } from "react-router-dom"
 import "../assets/main.css"
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import casinha from "../assets/home.png"
 import HomeButton from "../components/HomeButton"
 import DatePicker from "react-datepicker"
@@ -19,7 +19,7 @@ export default function ConsultarAgendas() {
     const [idCBOProfissional, setIdCBOProfissional] = useState("");
     const [horarios, setHorarios] = useState();
     const [FAST_SessionId, setFAST_SessionId] = useState("")
-    const [data_selecionada, setData_selecionada] = useState(new Date())
+    const [data_selecionada, setData_selecionada] = useState(formatarData(new Date()))
     const [cidadaoID, setCidadaoID] = useState("")
     const [cnsParaAgendar, setCnsParaAgendar] = useState({})
     const [errosAgendamento, setErrosAgendamento] = useState({})
@@ -27,12 +27,126 @@ export default function ConsultarAgendas() {
     const [opcoesBloqueio , setOpcoesBloqueio] = useState([])
     const [idBloqueio, setIdBloqueio] = useState(10)
     const [dadosFormatados, setDadosFormatados] = useState({})
+    const [cnsPorHorario, setCnsPorHorario] = useState({})
+    const inputPdfRef = useRef(null)
+
+    function formatarData(data) {
+        const dia = String(data.getDate()).padStart(2, "0")
+        const mes = String(data.getMonth() + 1).padStart(2, "0")
+        return `${dia}/${mes}/${data.getFullYear()}`
+    }
+
+    function normalizarNome(nome) {
+        return nome
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/\s+/g, " ")
+            .trim()
+            .toUpperCase()
+    }
+
+    function extrairDadosPdf(texto) {
+        const textoPdf = texto.replace(/\r/g, "")
+        const data = textoPdf.match(/Data:\s*(\d{2}\/\d{2}\/\d{4})/i)?.[1]
+        const profissional = textoPdf
+            .match(/Profissional:\s*([^\n]+)/i)?.[1]
+            ?.split(" - ")[0]
+            .trim()
+        const cnsPorHorarioExtraido = {}
+        const blocos = textoPdf.matchAll(
+            /(?:^|\n)\s*(\d{2}:\d{2})\s+[\s\S]*?(?=\n\s*\d{2}:\d{2}\s|$)/g
+        )
+
+        for (const bloco of blocos) {
+            const hora = bloco[1]
+            const cns = bloco[0].match(/CNS:\s*(\d{15})/i)?.[1]
+            if (cns) cnsPorHorarioExtraido[hora] = cns
+        }
+
+        return { data, profissional, cnsPorHorario: cnsPorHorarioExtraido }
+    }
+
+    function horaDoHorario(horario) {
+        return horario.hora?.match(/\d{2}:\d{2}/)?.[0] || ""
+    }
+
+    const importarPdf = async (event) => {
+        setErrosAgendamento({})
+        const file = event.target.files[0]
+        event.target.value = ""
+        if (!file) return
+
+        setHorarios([])
+        setCnsParaAgendar({})
+        setCnsPorHorario({})
+
+        const arrayBuffer = await file.arrayBuffer()
+        const resultado = await window.electron.extrairTextoPdf(new Uint8Array(arrayBuffer))
+        if (!resultado.sucesso) {
+            alert(`Não foi possível ler o PDF: ${resultado.erro}`)
+            return
+        }
+
+        const dadosPdf = extrairDadosPdf(resultado.texto)
+        setCnsPorHorario(dadosPdf.cnsPorHorario)
+
+        if (!dadosPdf.data || !dadosPdf.profissional) {
+            alert("Não foi possível identificar a data e o profissional no PDF.")
+            return
+        }
+
+        if (dadosPdf.data) {
+            const [dia, mes, ano] = dadosPdf.data.split("/")
+            setData_selecionada(dadosPdf.data)
+            document.querySelector(".inputData").value = `${ano}-${mes}-${dia}`
+        }
+
+        const profissionalPdf = normalizarNome(dadosPdf.profissional || "")
+        const profissionalEncontrado = profissionais.find((profissional) => {
+            const nomeSelect = profissional.texto.split(" - ")[0]
+            return normalizarNome(nomeSelect) === profissionalPdf
+        })
+
+        if (profissionalEncontrado) {
+            const [id, tipo, cbo] = profissionalEncontrado.value.split(",")
+            setProfissionalId(id)
+            setTipoAgenda(tipo)
+            setIdCBOProfissional(cbo)
+            document.querySelector(".selectProfissional").value = profissionalEncontrado.value
+
+            const resposta = await window.electron.verificarHorariosDoDia({
+                datConsulta: dadosPdf.data,
+                codProfissional: id,
+                codSiasusSms: tipo,
+                tipVisualizacao: 1,
+                codAcaoOrigem: "0",
+                codGrupoEspecialidade: cbo,
+                indTeleatendimento: false,
+                indMobilidade: false,
+                session: FAST_SessionId
+            })
+
+            setCnsParaAgendar((prev) => {
+                const preenchidos = { ...prev }
+                resposta.forEach((horario) => {
+                    const cns = dadosPdf.cnsPorHorario[horaDoHorario(horario)]
+                    if (cns) preenchidos[horario.seqAgenda] = cns
+                })
+                return preenchidos
+            })
+            setHorarios(resposta)
+        } else {
+            alert("O profissional do PDF não foi encontrado no select.")
+        }
+    }
     
     const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 
 
     const salvar = async () => {
+        //limpa os erros pra proxima run
+        
     for (const horario of horarios) {
 
         // pula horários que já possuem usuário
@@ -371,7 +485,7 @@ export default function ConsultarAgendas() {
             <div className='selectDias flex-center'>
                 <button onClick={verificarHorariosDoDia}>Consultar Hórarios</button>
                 
-                <input className='inputData' type="date"  onChange={(e) => {
+                <input className='inputData' type="date" value={data_selecionada.split("/").reverse().join("-")} onChange={(e) => {
                     const data = e.target.value; // yyyy-mm-dd
                     const [ano, mes, dia] = data.split("-");
                     setData_selecionada(`${dia}/${mes}/${ano}`);
@@ -382,6 +496,15 @@ export default function ConsultarAgendas() {
 
 
             </div>
+
+            <button type="button" onClick={() => inputPdfRef.current?.click()}>Importar PDF</button>
+            <input
+                ref={inputPdfRef}
+                type="file"
+                accept=".pdf,application/pdf"
+                onChange={importarPdf}
+                style={{ display: "none" }}
+            />
                 
 
             {/* SELECT DO PROFISSIONAL */}
@@ -441,7 +564,9 @@ export default function ConsultarAgendas() {
             ) : (
                 <>
                     <input
-                        value={cnsParaAgendar[horario.seqAgenda] || ""}
+                        value={Object.prototype.hasOwnProperty.call(cnsParaAgendar, horario.seqAgenda)
+                            ? cnsParaAgendar[horario.seqAgenda]
+                            : cnsPorHorario[horaDoHorario(horario)] || ""}
                         onFocus={() => {setInputAtivo(horario.seqAgenda)}}
                         onBlur={() => {setTimeout(() => setInputAtivo(null), 100)}}
                         onChange={(e) => {

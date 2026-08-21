@@ -151,15 +151,20 @@ function Home() {
 				<button onClick={getFastMedicSession}>sessionID</button>
 				<button onClick={buscarProfissional}>Buscar Profissional</button>
 				<button onClick={() => navigate('/testandopesquisa')}>Barra de pesquisa WIP</button> */}
+				{/* <button onClick={() => navigate('/testandopesquisa')}>Barra de pesquisa WIP</button> */}
 				<button onClick={openLoginPage}>{dados? "Atualizar Login" : "Login"}</button>
 				<button onClick={() => navigate('/ConsultarAgendas')}>Agendar consultas</button>
 				{nome?.toLowerCase().includes("celere") && <button className='analyticsBtn' onClick={() => navigate('/Analytics')}>Relatorios</button>}
+
 
 				<div className='patchNotes'>
 
 					<p>Notas da Versão</p>
 					<p>v{version}_public</p>
-					<p style={{textAlign:"start"}}>Aba de Relatorios foi adicionada</p>
+					<p style={{textAlign:"start"}}>Agora é possivel importar um PDF baixado diretamente do pec, Ao selecionar,
+						o programa automáticamente detecta se o profissional possui agenda na unidade em questão, seleciona
+						o dia automaticamente pelo pdf e preenche os agendamentos.
+					</p>
 					
 				</div>
 

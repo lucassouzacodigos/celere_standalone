@@ -5,6 +5,7 @@ import { autoUpdater } from 'electron-updater'
 import icon from '../../resources/icon.png?asset'
 import {buscarProfissional} from './scripts/buscarProfissionais'
 import * as cheerio from 'cheerio'
+import { PDFParse } from 'pdf-parse'
 
 
 let dadoslogin
@@ -463,6 +464,35 @@ app.whenReady().then(async () => {
     })
     
   })
+
+    const { PDFParse } = require('pdf-parse')
+
+    ipcMain.handle('extrair-texto-pdf', async (event, dados) => {
+        try {
+            const buffer = Buffer.from(dados)
+
+            const parser = new PDFParse({
+                data: buffer
+            })
+
+            const resultado = await parser.getText()
+
+            await parser.destroy()
+
+            return {
+                sucesso: true,
+                texto: resultado.text
+            }
+
+        } catch (error) {
+            console.error('Erro ao extrair PDF:', error)
+
+            return {
+                sucesso: false,
+                erro: error.message
+            }
+        }
+    })
 
 
 

@@ -824,7 +824,7 @@ button:disabled:hover {
 .analyticsRowSummary {
   min-height: 48px;
   display: grid;
-  grid-template-columns: 100px minmax(180px, 1.4fr) minmax(150px, 1fr) 22px;
+  grid-template-columns: 100px minmax(180px, 1.2fr) minmax(150px, 1fr) minmax(150px, 1fr);
   align-items: center;
   gap: 18px;
   padding: 8px 14px 8px 19px;
@@ -832,6 +832,7 @@ button:disabled:hover {
 
 .analyticsRowDate,
 .analyticsRowPerson,
+.analyticsRowResponsible,
 .analyticsRowUnit {
   min-width: 0;
   display: flex;
@@ -852,6 +853,7 @@ button:disabled:hover {
 }
 
 .analyticsRowPerson strong,
+.analyticsRowResponsible strong,
 .analyticsRowUnit strong {
   overflow: hidden;
   color: #dce5de;
@@ -870,42 +872,11 @@ button:disabled:hover {
 }
 
 .analyticsExpandHint {
-  display: flex;
-  width: 22px;
-  height: 22px;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #506056;
-  border-radius: 50%;
-  color: #aab6ad;
-  font-size: 17px;
-  line-height: 1;
-  transition: transform 160ms ease, color 160ms ease, border-color 160ms ease;
-}
-
-.analyticsRow:hover .analyticsExpandHint,
-.analyticsRow:focus-visible .analyticsExpandHint {
-  border-color: #93fa9b;
-  color: #93fa9b;
-  transform: rotate(45deg);
+  display: none;
 }
 
 .analyticsRowDetails {
-  display: grid;
-  grid-template-rows: 0fr;
-  opacity: 0;
-  transition: grid-template-rows 180ms ease, opacity 140ms ease;
-}
-
-.analyticsRowDetails > .analyticsDetails {
-  min-height: 0;
-  overflow: hidden;
-}
-
-.analyticsRow:hover .analyticsRowDetails,
-.analyticsRow:focus-visible .analyticsRowDetails {
-  grid-template-rows: 1fr;
-  opacity: 1;
+  display: none;
 }
 
 .analyticsDetails {
@@ -986,7 +957,7 @@ button:disabled:hover {
   }
 
   .analyticsRowSummary {
-    grid-template-columns: 72px minmax(0, 1fr) 22px;
+    grid-template-columns: 72px minmax(0, 1fr) minmax(100px, 0.8fr);
     gap: 10px;
     padding: 7px 10px 7px 15px;
   }
@@ -1037,4 +1008,15 @@ button:disabled:hover {
   box-shadow:
     0 10px 25px rgba(0, 0, 0, 0.35),
     0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.analyticsRowResponsible span {
+  color: #849187;
+  font-size: 11px;
+}
+
+.analyticsRowResponsible strong {
+  color: #dce5de;
+  font-size: 13px;
+  font-weight: 650;
 }

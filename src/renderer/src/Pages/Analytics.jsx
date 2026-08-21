@@ -85,6 +85,10 @@ export default function Analytics () {
                                     <strong>{item.agendadoPara || "Pessoa não informada"}</strong>
                                     <span>{selectedMode?.label}</span>
                                 </div>
+                                <div className="analyticsRowResponsible">
+                                    <span>Responsável</span>
+                                    <strong>{item.quemAgendou || "Não informado"}</strong>
+                                </div>
                                 <div className="analyticsRowUnit">
                                     <span>Unidade</span>
                                     <strong>{item.unidade || "Não informada"}</strong>
