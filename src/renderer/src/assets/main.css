@@ -869,27 +869,6 @@ button:disabled:hover {
   text-transform: uppercase;
 }
 
-.analyticsExpandHint {
-  display: flex;
-  width: 22px;
-  height: 22px;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #506056;
-  border-radius: 50%;
-  color: #aab6ad;
-  font-size: 17px;
-  line-height: 1;
-  transition: transform 160ms ease, color 160ms ease, border-color 160ms ease;
-}
-
-.analyticsRow:hover .analyticsExpandHint,
-.analyticsRow:focus-visible .analyticsExpandHint {
-  border-color: #93fa9b;
-  color: #93fa9b;
-  transform: rotate(45deg);
-}
-
 .analyticsRowDetails {
   display: grid;
   grid-template-rows: 0fr;
@@ -900,12 +879,6 @@ button:disabled:hover {
 .analyticsRowDetails > .analyticsDetails {
   min-height: 0;
   overflow: hidden;
-}
-
-.analyticsRow:hover .analyticsRowDetails,
-.analyticsRow:focus-visible .analyticsRowDetails {
-  grid-template-rows: 1fr;
-  opacity: 1;
 }
 
 .analyticsDetails {

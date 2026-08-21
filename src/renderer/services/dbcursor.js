@@ -1,6 +1,6 @@
 
 
-import {addDoc, collection, getDocs, getDoc, doc, } from "firebase/firestore";
+import {addDoc, collection, getDocs, getDoc, doc, limit, query, } from "firebase/firestore";
 import db from "./firebase"
 
 
@@ -19,7 +19,7 @@ async function addRegister(unidade, quemAgendou, agendadoPara, tipoAcao) {
 } 
 
 async function getAllRegisters() {
-    const querySnapshot = await getDocs(collection(db, "agendamentos"));
+    const querySnapshot = await getDocs(query(collection(db, "agendamentos"), limit(100)));
     const agendamentos = [];
     querySnapshot.forEach((doc) => {
         agendamentos.push(doc.data());

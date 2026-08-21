@@ -139,14 +139,6 @@
     transition: height 180ms ease, opacity 140ms ease, padding 180ms ease, border-color 180ms ease;
 }
 
-.linhaResultado:hover .resultadoDetalhes,
-.linhaResultado:focus-visible .resultadoDetalhes {
-    height: auto;
-    padding: 10px 0 12px;
-    border-color: #405146;
-    opacity: 1;
-}
-
 .resultadoDetalhes > span {
     min-width: 0;
     overflow: hidden;

@@ -89,7 +89,6 @@ export default function Analytics () {
                                     <span>Unidade</span>
                                     <strong>{item.unidade || "Não informada"}</strong>
                                 </div>
-                                <span className="analyticsExpandHint" aria-hidden="true">+</span>
                             </div>
                             <div className="analyticsRowDetails">
                                 <dl className="analyticsDetails">
