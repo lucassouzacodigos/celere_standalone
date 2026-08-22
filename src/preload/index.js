@@ -35,6 +35,7 @@ if (process.contextIsolated) {
     bloqueioADMUnico: (dados) => ipcRenderer.invoke('bloqueio-adm-unico', dados),
     getVersion: () => ipcRenderer.invoke('get-version'),
     getDadosFormatados: () => ipcRenderer.invoke('get-dados-formatados'),
+    extrairTextoPdf: (pdfBuffer) => ipcRenderer.invoke('extrair-texto-pdf', pdfBuffer),
   }
   window.api = api
 }

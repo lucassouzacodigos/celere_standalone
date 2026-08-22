@@ -110,12 +110,13 @@ const HorarioAgenda = memo(function HorarioAgenda({
 export default function ConsultarAgendas() {
     const navigate = useNavigate()
     const [profissionais, setProfissionais] = useState([]);
+    const [profissionalSelecionado, setProfissionalSelecionado] = useState("");
     const [profissionalId, setProfissionalId] = useState("");
     const [tipoAgenda, setTipoAgenda] = useState("");
     const [idCBOProfissional, setIdCBOProfissional] = useState("");
     const [horarios, setHorarios] = useState();
     const [FAST_SessionId, setFAST_SessionId] = useState("")
-    const [data_selecionada, setData_selecionada] = useState(new Date())
+    const [data_selecionada, setData_selecionada] = useState(formatarData(new Date()))
     const [cidadaoID, setCidadaoID] = useState("")
     const [cnsParaAgendar, setCnsParaAgendar] = useState({})
     const [errosAgendamento, setErrosAgendamento] = useState({})
@@ -127,8 +128,112 @@ export default function ConsultarAgendas() {
     const deletarRef = useRef(null)
     const agendarRef = useRef(null)
     const atualizarRef = useRef(null)
+    const inputPdfRef = useRef(null)
     
     const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+    function formatarData(data) {
+        const dia = String(data.getDate()).padStart(2, "0")
+        const mes = String(data.getMonth() + 1).padStart(2, "0")
+        return `${dia}/${mes}/${data.getFullYear()}`
+    }
+
+    function normalizarNome(nome) {
+        return nome
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/\s+/g, " ")
+            .trim()
+            .toUpperCase()
+    }
+
+    function horaDoHorario(horario) {
+        return horario?.hora?.match(/\d{2}:\d{2}/)?.[0] || ""
+    }
+
+    function extrairDadosPdf(texto) {
+        const textoPdf = texto.replace(/\r/g, "")
+        const data = textoPdf.match(/Data:\s*(\d{2}\/\d{2}\/\d{4})/i)?.[1]
+        const profissional = textoPdf
+            .match(/Profissional:\s*([^\n]+)/i)?.[1]
+            ?.split(" - ")[0]
+            .trim()
+        const cnsPorHorario = {}
+        const blocos = textoPdf.matchAll(
+            /(?:^|\n)\s*(\d{2}:\d{2})(?:\s+|\n)[\s\S]*?(?=\n\s*\d{2}:\d{2}\s|$)/g
+        )
+
+        for (const bloco of blocos) {
+            const cns = bloco[0].match(/CNS:\s*(\d{15})/i)?.[1]
+            if (cns) cnsPorHorario[bloco[1]] = cns
+        }
+
+        return { data, profissional, cnsPorHorario }
+    }
+
+    const importarPdf = async (event) => {
+        const file = event.target.files[0]
+        event.target.value = ""
+        if (!file) return
+
+        setHorarios([])
+        setCnsParaAgendar({})
+        setErrosAgendamento({})
+
+        try {
+            const arrayBuffer = await file.arrayBuffer()
+            const resultado = await window.electron.extrairTextoPdf(new Uint8Array(arrayBuffer))
+
+            if (!resultado?.sucesso) {
+                throw new Error(resultado?.erro || "Não foi possível extrair o texto do PDF.")
+            }
+
+            const dadosPdf = extrairDadosPdf(resultado.texto)
+            if (!dadosPdf.data || !dadosPdf.profissional) {
+                throw new Error("Não foi possível identificar a data e o profissional no PDF.")
+            }
+
+            setData_selecionada(dadosPdf.data)
+            const profissionalEncontrado = profissionais.find((profissional) => {
+                const nomeSelect = profissional.texto.split(" - ")[0]
+                return normalizarNome(nomeSelect) === normalizarNome(dadosPdf.profissional)
+            })
+
+            if (!profissionalEncontrado) {
+                throw new Error(`O profissional "${dadosPdf.profissional}" não foi encontrado no select.`)
+            }
+
+            const [id, tipo, cbo] = profissionalEncontrado.value.split(",")
+            setProfissionalId(id)
+            setTipoAgenda(tipo)
+            setIdCBOProfissional(cbo)
+            setProfissionalSelecionado(profissionalEncontrado.value)
+
+            const session = await window.electron.getFastMedicSession()
+            const resposta = await window.electron.verificarHorariosDoDia({
+                datConsulta: dadosPdf.data,
+                codProfissional: id,
+                codSiasusSms: tipo,
+                tipVisualizacao: 1,
+                codAcaoOrigem: "0",
+                codGrupoEspecialidade: cbo,
+                indTeleatendimento: false,
+                indMobilidade: false,
+                session
+            })
+
+            const cnsPorSeqAgenda = {}
+            resposta.forEach((horario) => {
+                const cns = dadosPdf.cnsPorHorario[horaDoHorario(horario)]
+                if (cns) cnsPorSeqAgenda[horario.seqAgenda] = cns
+            })
+
+            setCnsParaAgendar(cnsPorSeqAgenda)
+            setHorarios(resposta)
+        } catch (error) {
+            alert(error.message)
+        }
+    }
 
 
 
@@ -412,6 +517,7 @@ export default function ConsultarAgendas() {
     
     function selecionarProfissional(e) {
         const value = e.target.value;
+        setProfissionalSelecionado(value);
         
         // Pega apenas o primeiro número
         const id = value.split(",")[0];
@@ -476,7 +582,7 @@ export default function ConsultarAgendas() {
             <div className='selectDias flex-center'>
                 <button onClick={verificarHorariosDoDia}>Consultar Hórarios</button>
                 
-                <input className='inputData' type="date"  onChange={(e) => {
+                <input className='inputData' type="date" value={data_selecionada.split("/").reverse().join("-")} onChange={(e) => {
                     const data = e.target.value; // yyyy-mm-dd
                     const [ano, mes, dia] = data.split("-");
                     setData_selecionada(`${dia}/${mes}/${ano}`);
@@ -487,10 +593,21 @@ export default function ConsultarAgendas() {
 
 
             </div>
+
+            <button type="button" onClick={() => inputPdfRef.current?.click()}>
+                Importar PDF
+            </button>
+            <input
+                ref={inputPdfRef}
+                type="file"
+                accept=".pdf,application/pdf"
+                onChange={importarPdf}
+                style={{ display: "none" }}
+            />
                 
 
             {/* SELECT DO PROFISSIONAL */}
-            <select onChange={selecionarProfissional} className='selectProfissional'>
+            <select value={profissionalSelecionado} onChange={selecionarProfissional} className='selectProfissional'>
             <option style={{textAlign: "center"}} value="">SELECIONE O PROFISSIONAL</option>
             {profissionais.map((profissional) => (
                 <option

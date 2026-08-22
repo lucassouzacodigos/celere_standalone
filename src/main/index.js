@@ -1,5 +1,6 @@
 import { app, shell, BrowserWindow, ipcMain, session } from 'electron'
 import { join } from 'path'
+import { PDFParse } from 'pdf-parse'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { autoUpdater } from 'electron-updater'
 import icon from '../../resources/icon.png?asset'
@@ -462,6 +463,19 @@ app.whenReady().then(async () => {
       body: JSON.stringify(dados)
     })
     
+  })
+
+  ipcMain.handle('extrair-texto-pdf', async (event, dados) => {
+    try {
+      const parser = new PDFParse({ data: Buffer.from(dados) })
+      const resultado = await parser.getText()
+      await parser.destroy()
+
+      return { sucesso: true, texto: resultado.text }
+    } catch (error) {
+      console.error('Erro ao extrair texto do PDF:', error)
+      return { sucesso: false, erro: error.message }
+    }
   })
 
 
