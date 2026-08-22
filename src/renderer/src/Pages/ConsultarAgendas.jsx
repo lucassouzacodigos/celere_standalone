@@ -1,6 +1,6 @@
 import { data, useNavigate } from "react-router-dom"
 import "../assets/main.css"
-import { useEffect, useState } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
 import casinha from "../assets/home.png"
 import HomeButton from "../components/HomeButton"
 import DatePicker from "react-datepicker"
@@ -10,6 +10,102 @@ import { Lock, SaveAll, Trash2, UserSearch, LockKeyhole } from "lucide-react"
 import ResultadosPesquisaModal from "../components/ResultadoPesquisaModal/ResultadosPesquisaModal"
 import { addRegister } from "../../services/dbcursor"
 
+const HorarioAgenda = memo(function HorarioAgenda({
+    horario,
+    cns,
+    isInputAtivo,
+    opcoesBloqueio,
+    setInputAtivo,
+    setCnsParaAgendar,
+    bloqueioRef,
+    deletarRef,
+    agendarRef,
+    atualizarRef,
+}) {
+    return (
+        <motion.div
+            className="horarioBlock"
+            initial={{ opacity: 0, y: 80 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+        >
+            <div className="horarioHeader">
+                <p id="horaConsulta" style={{ margin: 2 }}>{horario.hora}</p>
+
+                {horario.usuario ? (
+                    <p className="titulosBranco">{horario.usuario}</p>
+                ) : horario.tipo ? (
+                    <p className="vagaBloqueada">Vaga bloqueada</p>
+                ) : (
+                    <>
+                        <input
+                            value={cns}
+                            onFocus={() => setInputAtivo(horario.seqAgenda)}
+                            onBlur={() => { setTimeout(() => setInputAtivo(null), 100) }}
+                            onChange={(event) => {
+                                setCnsParaAgendar((prev) => ({
+                                    ...prev,
+                                    [horario.seqAgenda]: event.target.value,
+                                }))
+                            }}
+                        />
+
+                        <div className="bloqueio">
+                            <label className="lockButton">
+                                <LockKeyhole size={18} />
+                                <select
+                                    onChange={(event) => bloqueioRef.current(
+                                        horario.codParametroAgenda,
+                                        horario.seqAgenda,
+                                        event.target.value
+                                    )}
+                                >
+                                    {opcoesBloqueio.map((bloqueio) => (
+                                        <option key={bloqueio.value} value={bloqueio.value}>
+                                            {bloqueio.text}
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+                        </div>
+                    </>
+                )}
+
+                <button
+                    className="buttonDelete"
+                    onClick={() => deletarRef.current(
+                        horario.codParametroAgenda,
+                        horario.seqAgenda
+                    )}
+                >
+                    <Trash2 size={18} />
+                </button>
+            </div>
+
+            <div className="horarioInfo">
+                <p><strong>Tipo:</strong> {horario.tipo || "—"}</p>
+                <p><strong>Observação:</strong> {horario.observacao || "—"}</p>
+            </div>
+
+            {cns && !horario.usuario && isInputAtivo && (
+                <AnimatePresence>
+                    <ResultadosPesquisaModal
+                        busca={cns}
+                        seqAgenda={horario.seqAgenda}
+                        codParametroAgenda={horario.codParametroAgenda}
+                        agendar={agendarRef.current}
+                        refresh={atualizarRef.current}
+                    />
+                </AnimatePresence>
+            )}
+        </motion.div>
+    )
+}, (previous, next) => (
+    previous.horario === next.horario &&
+    previous.cns === next.cns &&
+    previous.isInputAtivo === next.isInputAtivo &&
+    previous.opcoesBloqueio === next.opcoesBloqueio
+))
 
 export default function ConsultarAgendas() {
     const navigate = useNavigate()
@@ -27,6 +123,10 @@ export default function ConsultarAgendas() {
     const [opcoesBloqueio , setOpcoesBloqueio] = useState([])
     const [idBloqueio, setIdBloqueio] = useState(10)
     const [dadosFormatados, setDadosFormatados] = useState({})
+    const bloqueioRef = useRef(null)
+    const deletarRef = useRef(null)
+    const agendarRef = useRef(null)
+    const atualizarRef = useRef(null)
     
     const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -323,6 +423,11 @@ export default function ConsultarAgendas() {
         setIdCBOProfissional(CBOProfissional);
         
     }
+
+    bloqueioRef.current = bloqueioADMUnico
+    deletarRef.current = deletarAgendamentoUsuario
+    agendarRef.current = agendarUsuarioPorCPFouCNS
+    atualizarRef.current = verificarHorariosDoDia
     
     
     
@@ -407,124 +512,20 @@ export default function ConsultarAgendas() {
         <div className="horariosContainer">
             <p >Horarios: </p>
         {horarios &&
-            horarios.map((horario, index) => (
-                <motion.div
-                    key={index}
-                    className="horarioBlock"
-                    initial={{
-                        opacity: 0,
-                        y: 80
-                    }}
-                    animate={{
-                        opacity: 1,
-                        y: 0
-                    }}
-                    transition={{
-                        duration: 0.3,
-                        delay: index * 0.08
-                    }}
-                >
-                
-                    {/* parte de cima do bloco */}
-                    <div className="horarioHeader">
-
-            {/* Horas */}
-            <p id="horaConsulta" style={{ margin: 2 }}>
-                {horario.hora}
-            </p>
-
-            {/* Usuario / bloqueio / input */}
-            {horario.usuario ? (
-                <p className="titulosBranco">{horario.usuario}</p>
-            ) : horario.tipo ? (
-                <p className="vagaBloqueada">Vaga bloqueada</p>
-            ) : (
-                <>
-                    <input
-                        value={cnsParaAgendar[horario.seqAgenda] || ""}
-                        onFocus={() => {setInputAtivo(horario.seqAgenda)}}
-                        onBlur={() => {setTimeout(() => setInputAtivo(null), 100)}}
-                        onChange={(e) => {
-                            setCnsParaAgendar((prev) => ({
-                                ...prev,
-                                [horario.seqAgenda]: e.target.value,
-                            }));
-                        }}
-                    />
-
-                    {/* BLOQUEIO ADM */}
-                    <div className="bloqueio">
-                        <label className="lockButton">
-                            <LockKeyhole size={18} />
-
-                            <select
-                                onChange={(e) =>
-                                    bloqueioADMUnico(
-                                        horario.codParametroAgenda,
-                                        horario.seqAgenda,
-                                        e.target.value
-                                    )
-                                }
-                            >
-                                {opcoesBloqueio.map((bloqueio) => (
-                                    <option
-                                        key={bloqueio.value}
-                                        value={bloqueio.value}
-                                    >
-                                        {bloqueio.text}
-                                    </option>
-                                ))}
-                            </select>
-                        </label>
-                    </div>
-                </>
-
-                
-            )}
-
-
-            
-
-            {/* Deletar */}
-            <button
-                className="buttonDelete"
-                onClick={() => {
-                    console.log("ENVIADO:", horario.seqAgenda, horario.codParametroAgenda)
-                    deletarAgendamentoUsuario(
-                        horario.codParametroAgenda,
-                        horario.seqAgenda,
-                        ); 
-                }}
-            >
-                <Trash2 size={18} />
-            </button>
-
-
-        </div>
-
-                    <div className="horarioInfo">
-                        <p>
-                            <strong>Tipo:</strong> {horario.tipo || "—"}
-                        </p>
-
-                        <p>
-                            <strong>Observação:</strong> {horario.observacao || "—"}
-                        </p>
-                    </div>
-                    {
-                        cnsParaAgendar[horario.seqAgenda] && !horario.usuario && inputAtivo === horario.seqAgenda &&
-                        <AnimatePresence>
-                            <ResultadosPesquisaModal 
-                                busca={cnsParaAgendar[horario.seqAgenda]}  
-                                seqAgenda={horario.seqAgenda} 
-                                codParametroAgenda={horario.codParametroAgenda} 
-                                agendar={agendarUsuarioPorCPFouCNS} 
-                                refresh={verificarHorariosDoDia}
-                            />
-                        </AnimatePresence>
-                    }
-                </motion.div>
-                
+            horarios.map((horario) => (
+                <HorarioAgenda
+                    key={horario.seqAgenda}
+                    horario={horario}
+                    cns={cnsParaAgendar[horario.seqAgenda] || ""}
+                    isInputAtivo={inputAtivo === horario.seqAgenda}
+                    opcoesBloqueio={opcoesBloqueio}
+                    setInputAtivo={setInputAtivo}
+                    setCnsParaAgendar={setCnsParaAgendar}
+                    bloqueioRef={bloqueioRef}
+                    deletarRef={deletarRef}
+                    agendarRef={agendarRef}
+                    atualizarRef={atualizarRef}
+                />
             )) || "Selecione o profissional e a data"}
                         
 

@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import "./modal.css"
 import { motion } from "motion/react"
 
@@ -9,36 +9,34 @@ import Spinner from "../Spinner"
 
 export default function ResultadosPesquisaModal({ busca, agendar, seqAgenda, codParametroAgenda, refresh }) {
 
-    const [FAST_SessionId, setFAST_SessionId] = useState("")
     const [resultadoPesquisa, setResultadoPesquisa] = useState([])
+    const FAST_SessionId = useRef("")
 
 
 
     useEffect(() => {
+        window.electron.getFastMedicSession().then((sessionId) => {
+            FAST_SessionId.current = sessionId || ""
+        })
+    }, [])
+
+    useEffect(() => {
         const timer = setTimeout(() => {
-            if (busca.trim() !== "") {
-            pesquisar()
+            if (busca.trim().length >= 3) {
+                pesquisar(busca.trim())
+            } else {
+                setResultadoPesquisa([])
             }
-        }, 1000);
+        }, 450)
 
-        return () => clearTimeout(timer);
-    }, [busca]);
-
-
+        return () => clearTimeout(timer)
+    }, [busca])
 
 
-    const getDadosLogin = async () => {
-        const FAST_SessionId = await window.electron.getFastMedicSession()
-        setFAST_SessionId(FAST_SessionId)
-    }
-
-
-
-    const pesquisar = async () => {
-        await getDadosLogin()
+    const pesquisar = async (nomeUsuario) => {
 
         const dados = {
-            "nomeUsuario":busca,
+            "nomeUsuario":nomeUsuario,
             "nomeMae":"",
             "dataNascimento":"",
             "tipoPesquisa":0,
@@ -48,7 +46,7 @@ export default function ResultadosPesquisaModal({ busca, agendar, seqAgenda, cod
             "dscSexo":"",
             "idadeFinal":"",
             "idadeInicial":"",
-            "session":FAST_SessionId
+            "session":FAST_SessionId.current
         }
 
 
