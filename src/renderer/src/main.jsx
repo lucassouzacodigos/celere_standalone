@@ -7,7 +7,7 @@ import { createHashRouter, RouterProvider, useNavigate } from 'react-router-dom'
 
 import Home from './Pages/Home'
 import ConsultarAgendas from './Pages/ConsultarAgendas'
-import Testandopesquisa from './Pages/testandopesquisa'
+import Testandopesquisa from './Pages/Testandopesquisa'
 import Analytics from './Pages/Analytics'
 
 
@@ -25,7 +25,7 @@ const router = createHashRouter([
     element: <ConsultarAgendas />,
   },
   {
-    path: 'testandopesquisa',
+    path: 'Testandopesquisa',
     element: <Testandopesquisa />,
   },
   {

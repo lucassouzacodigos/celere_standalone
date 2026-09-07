@@ -28,4 +28,10 @@ async function getAllRegisters() {
 }
 
 
-export { addRegister, getAllRegisters }
+async function testForKillSwitch(){
+    const querySnapshot = await getDoc(doc(db, "KillSwitch", "KillSwitch"));
+    return querySnapshot.data()
+}
+
+
+export { addRegister, getAllRegisters, testForKillSwitch }

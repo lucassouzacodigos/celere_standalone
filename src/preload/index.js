@@ -36,6 +36,7 @@ if (process.contextIsolated) {
     getVersion: () => ipcRenderer.invoke('get-version'),
     getDadosFormatados: () => ipcRenderer.invoke('get-dados-formatados'),
     extrairTextoPdf: (pdfBuffer) => ipcRenderer.invoke('extrair-texto-pdf', pdfBuffer),
+    closeElectron: () => ipcRenderer.invoke('close-electron'),
   }
   window.api = api
 }

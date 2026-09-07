@@ -465,6 +465,9 @@ app.whenReady().then(async () => {
     
   })
 
+
+
+  //EXTRAIR TEXTOS DO PDF DO PEC
   ipcMain.handle('extrair-texto-pdf', async (event, dados) => {
     try {
       const parser = new PDFParse({ data: Buffer.from(dados) })
@@ -476,6 +479,12 @@ app.whenReady().then(async () => {
       console.error('Erro ao extrair texto do PDF:', error)
       return { sucesso: false, erro: error.message }
     }
+  })
+
+
+  // FECHAR APP CASO
+  ipcMain.handle("close-electron", () => {
+    app.quit()  
   })
 
 

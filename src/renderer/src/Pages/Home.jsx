@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import HomeButton from '../components/HomeButton.jsx'
 import Spinner from '../components/Spinner.jsx'
 import splash from '../assets/celeresplash2.gif'
+import { testForKillSwitch } from '../../services/dbcursor.js'
 
 
 function Home() {
@@ -69,6 +70,16 @@ function Home() {
 	}
 	
 	const openLoginPage = async () => {
+
+		const killswitch = await testForKillSwitch()
+
+		if (killswitch.KillSwitch == true){
+			alert("Kill Switch foi ativada, contate o suporte.")
+			window.electron.closeElectron()
+			return
+		}
+
+
 		if (dados) {
 			limparCache()
 		}
