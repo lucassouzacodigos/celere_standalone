@@ -465,6 +465,39 @@ export default function ConsultarAgendas() {
         await verificarHorariosDoDia()
     }
 
+    //BLOUEAR TODOS OS HORARIOS DE DEMANDA ESPONTANE (xx:45)
+    const bloquearHorariosDemandaEspontanea = async () => {
+        if (!horarios || horarios.length === 0) {
+            alert("Não há horários disponíveis")
+            return
+        }
+
+        // Busca o código do bloqueio "DEMANDA ESPONTANEA ENFERMAGEM"
+        const bloqueioEnfermagem = opcoesBloqueio.find(bloqueio => 
+            bloqueio.text === "DEMANDA ESPONTANEA ENFERMAGEM"
+        )
+
+        if (!bloqueioEnfermagem) {
+            alert("Bloqueio 'DEMANDA ESPONTANEA ENFERMAGEM' não encontrado nas opções")
+            return
+        }
+
+        // Percorre os horários e bloqueia os que terminam em :45
+        for (const horario of horarios) {
+
+            const hora = horario.hora
+            console.log(hora)
+            // Verifica se a hora termina em :45
+            if (hora && hora.includes(":45")) {
+                await bloqueioADMUnico(
+                    horario.codParametroAgenda,
+                    horario.seqAgenda,
+                    bloqueioEnfermagem.value
+                )
+            }
+        }
+    }
+
 
 
 
@@ -594,9 +627,18 @@ export default function ConsultarAgendas() {
 
             </div>
 
+            <button type="button" onClick={bloquearHorariosDemandaEspontanea}>
+                Bloquear demandas
+            </button>
+
             <button type="button" onClick={() => inputPdfRef.current?.click()}>
                 Importar PDF
             </button>
+
+            
+            
+
+
             <input
                 ref={inputPdfRef}
                 type="file"
