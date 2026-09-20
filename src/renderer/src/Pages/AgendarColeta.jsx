@@ -12,6 +12,9 @@ import { useEffect, useState } from "react";
 export default function AgendarColeta () {
 
     const [FAST_SessionId, setFAST_SessionId] = useState("")
+    const [documento, setDocumento] = useState("")
+    const [conselhoMedico, setConselhoMedico] = useState("")
+
 
     const getDadosLogin = async () => {
         const FAST_SessionId = await window.electron.getFastMedicSession()
@@ -32,9 +35,9 @@ export default function AgendarColeta () {
 
             
             <button onClick={async() => console.log(await coletasControler.iniciarProcessoAgendamentoColeta(1))}>insert procedimentos</button>
-            <button onClick={async() => console.log(await coletasControler.getDadosDoutor())}>get doutor</button>
+            <button onClick={async() => console.log(await coletasControler.getDadosDoutor(1234))}>get doutor</button>
             <button onClick={async() => console.log(await coletasControler.getDadosPaciente())}>get poaciente</button>
-            <button onClick={async() => await coletasControler.AgendarColetaDeExameGenerico(documento, conselhomedico)}>agendar coleta</button>
+            <button onClick={async() => await coletasControler.AgendarColetaDeExameGenerico(1, 1234)}>agendar coleta</button>
  
 
         </div>

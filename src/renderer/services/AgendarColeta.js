@@ -143,7 +143,7 @@ async function AgendarColetaDeExameGenerico(documento, crmDoutor) {
             "CodCBOS2002": "137",
             "CodGrupoEspecialidade": "2",
             "CodSubModuloSistema": 1,
-            "CodFcesProfissionalConselho": dadosDoutor[0].CodFcesProfissionalConselho,
+            "CodFcesProfissionalConselho": 0,
             "NumIdade": 0,
             "CodCid": null,
             "DscCid": null,
@@ -216,6 +216,8 @@ async function AgendarColetaDeExameGenerico(documento, crmDoutor) {
         "JustificativaCidInvalido": null,
         "session": fastMedicSession
         }
+
+        // console.log(dados)
 
     const response = await window.electron.AgendarColetaDeExameGenerico(dados)
     console.log(response)
