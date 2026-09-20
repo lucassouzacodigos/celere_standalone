@@ -123,11 +123,11 @@ app.whenReady().then(async () => {
     loginWindow.webContents.on("did-finish-load", () => {
       // [REDACTED]
       loginWindow.webContents.executeJavaScript(`
-          document.querySelector("#inputUsuario").value = ""
+          document.querySelector("#inputUsuario").value = "44957764875"
         `)
 
       loginWindow.webContents.executeJavaScript(`
-          document.querySelector("#inputSenha").value = ""
+          document.querySelector("#inputSenha").value = "uhjbnm321"
         `)
     })
 
@@ -455,6 +455,45 @@ app.whenReady().then(async () => {
 
 
 
+
+
+
+
+
+    //REQUEST PRA ABRIR A AGENDA DE COLETAS E PEGAR ALGUNS DADOS NECESSARIOS
+    ipcMain.handle('iniciar-marcacao-de-data-de-coleta-para-exame', async (event, dados) => {
+
+      const ses = session.fromPartition("persist:saude-session");
+
+      const resposta = await ses.fetch(`${baseUrl}/celere.embudasartes/Pep/AgendamentoColetaExame/CarregarAgendamentoColetaExame`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-Requested-With": "XMLHttpRequest"
+          },
+          body: JSON.stringify(dados)
+        });
+        const texto = await resposta.text()
+        return JSON.parse(JSON.parse(texto))
+    })
+
+
+    //REQUEST QUE MARCA O DIA PARA A COLETA DO EXAME GENERICO
+    ipcMain.handle('marcar-dia-coleta-do-exame-generico', async (event, dados) => {
+      const ses = session.fromPartition("persist:saude-session");
+
+      const resposta = await ses.fetch(`${baseUrl}/celere.embudasartes/Pep/AgendamentoColetaExame/SalvarAgendamentoColeta`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-Requested-With": "XMLHttpRequest"
+          },
+          body: JSON.stringify(dados)
+        });
+        const texto = await resposta.text()
+        console.log(texto)
+        return JSON.parse(JSON.parse(texto))
+    })
 
 
 

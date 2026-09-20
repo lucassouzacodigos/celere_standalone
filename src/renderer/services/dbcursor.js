@@ -18,6 +18,8 @@ async function addRegister(unidade, quemAgendou, agendadoPara, tipoAcao, pacient
         hora: hora || '',
         createdAt: new Date().getTime()
     })
+
+    console.log("Document written with ID: ", docRef.id);
 } 
 
 async function getAllRegisters() {

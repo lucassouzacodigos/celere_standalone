@@ -1,4 +1,4 @@
-
+import * as dbControler from "./dbcursor"
 
 
 
@@ -93,6 +93,28 @@ async function iniciarProcessoAgendamentoColeta(codUsuario){
 
 
 
+//getnome do paciente 
+    const getNomePorDocumento = async (documento) => {
+
+        const fastMedicSession = await window.electron.getFastMedicSession()
+
+        const dados = {
+            "numeroCartaoSaude":documento,
+            "tipoPesquisa":0,
+            "session":fastMedicSession
+        }
+        
+        const response = await window.electron.getUserIDByCNS(dados)
+        
+        if (response == "[]") {
+            console.log("cns = []")
+            return "[]"
+        } else {
+            return response?.NomUsuario
+        }
+    }
+
+
 
 
 
@@ -102,14 +124,14 @@ async function iniciarProcessoAgendamentoColeta(codUsuario){
 
 
 //agenda primeiro um exame da coleta de materais, pra posteriormente ser agendado em um dia da semana
-async function AgendarColetaDeExameGenerico(documento, crmDoutor) {
+async function AgendarColetaDeExameGenerico(documento, crmDoutor, dataParaColeta) {
 
     
     const fastMedicSession = await window.electron.getFastMedicSession()
     const dadosDoutor = await getDadosDoutor(crmDoutor)
-    console.log(dadosDoutor)
     const dadosPaciente = await getDadosPaciente(documento)
     const pacienteInseridoProcedimentos =  await iniciarProcessoAgendamentoColeta(dadosPaciente.CodUsuario)
+    const dadosFormatados = await window.electron.getDadosFormatados()
 
 
 
@@ -219,34 +241,87 @@ async function AgendarColetaDeExameGenerico(documento, crmDoutor) {
 
         // console.log(dados)
 
-    const response = await window.electron.AgendarColetaDeExameGenerico(dados)
-    console.log(response)
+        const response = await window.electron.AgendarColetaDeExameGenerico(dados)
+        console.log(response.Mensagem)
+        //nesse ponto, o exame generico ja deve estar adicionado ao paciente
+
+        //entao essa funcao abaixo, pega o pedido do exame e marca o dia da coleta dele
+        const respostaMarcaDiaColeta = await marcarDiaColetaDoExameGenerico(dadosPaciente.CodUsuario, dataParaColeta, pacienteInseridoProcedimentos.NumAtendimento, pacienteInseridoProcedimentos.CodFces)
 
 
+        const postoColetaLog = respostaMarcaDiaColeta.postoColeta
+        const quemAgendou = dadosFormatados.nome
+        const agendadoPara = dadosDoutor[0].NomeProfissional
+        const pacienteAgendado = await getNomePorDocumento(dadosPaciente.CodUsuario)
+
+        // console.log(respostaMarcaDiaColeta.postoColeta)
+        // console.log(dadosFormatados.nome)
+        // console.log(dadosDoutor[0].NomeProfissional)
+        // console.log(await getNomePorDocumento(dadosPaciente.CodUsuario))
+
+        //log -- infos que vao para o banco
+        dbControler.addRegister(postoColetaLog, quemAgendou, agendadoPara, 'Agendamento coleta', pacienteAgendado)
+
+
+        return response.Mensagem
 }
 
 
+// primeiro request para pegar dados do posto de coleta ( o default é qual o seu token logado esta vinculado )
+async function iniciarMarcacaoDeDataDeColetaParaExame (CodUsuario){
+    
+    const fastMedicSession = await window.electron.getFastMedicSession()
 
-
-
-
-async function agendarDiaParaColeta (codUsuario, fastMedicSession) {
     const dados = {
-        "codPostoColetaSelecionado":10,
-        "datSelecionada":"26/09/2026",
-        "codUsuario": codUsuario,
-        "listaExames":[{
-            "IndMarcado":true,
-            "CodFces":75,
-            "NumAtendimento":2209,
-            "SeqItemAtendimento":1,
-            "NumSiasus":363,
-            "SeqProcedimento":1,
-            "DatRealizacao":null,
-            "CodPostoColeta":0,
-            "IndPrioridade":false
-        }],
+        "CodFces": 0,
+        "NumAtendimento": 0,
+        "SeqItemAtendimento": 0,
+        "CodUsuario": CodUsuario,
         "session": fastMedicSession
+        }
+
+    const response = await window.electron.iniciarMarcacaoDeDataDeColetaParaExame(dados)
+    // console.log(response)
+    // console.log(response.Resultado.CodPostoColetaSelecionado)
+
+
+
+    return response
+    }
+
+
+//marcar de fato a coleta em um dia especifico
+async function marcarDiaColetaDoExameGenerico(CodUsuario, dataParaColeta, NumAtendimento, CodFces){
+    
+    const dadosAbrirAgendaColeta = await iniciarMarcacaoDeDataDeColetaParaExame(CodUsuario)
+    const fastMedicSession = await window.electron.getFastMedicSession()
+
+    const dados = {
+        "codPostoColetaSelecionado": dadosAbrirAgendaColeta.Resultado.CodPostoColetaSelecionado,
+        "datSelecionada": dataParaColeta,
+        "codUsuario": CodUsuario,
+        "listaExames": [
+            {
+            "IndMarcado": true,
+            "CodFces": CodFces,
+            "NumAtendimento": NumAtendimento,
+            "SeqItemAtendimento": 1,
+            "NumSiasus": 363,
+            "SeqProcedimento": 1,
+            "DatRealizacao": null,
+            "CodPostoColeta": 0,
+            "IndPrioridade": false
+            }
+        ],
+        "session": fastMedicSession
+        }
+
+    const postoColeta = dadosAbrirAgendaColeta.Resultado.ListaPostosColeta[0].DscPostoColeta
+    const response = await window.electron.marcarDiaColetaDoExameGenerico(dados)
+
+    return {
+        "postoColeta": postoColeta,
+        "mensagem": response
     }
 }
 
@@ -255,4 +330,5 @@ async function agendarDiaParaColeta (codUsuario, fastMedicSession) {
 
 
 
-export { fechar, AgendarColetaDeExameGenerico, agendarDiaParaColeta, iniciarProcessoAgendamentoColeta, getDadosDoutor, getDadosPaciente }
+
+export { fechar, AgendarColetaDeExameGenerico, iniciarMarcacaoDeDataDeColetaParaExame, iniciarProcessoAgendamentoColeta, getDadosDoutor, getDadosPaciente }

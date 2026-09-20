@@ -41,6 +41,8 @@ if (process.contextIsolated) {
     AgendarColetaDeExameGenerico: (dados) => ipcRenderer.invoke('agendar-coleta-de-exame-generico', dados),
     iniciarProcessoAgendamentoColeta: (dados) => ipcRenderer.invoke('iniciar-processo-agendamento-coleta', dados),
     getDadosDoutor: (dados) => ipcRenderer.invoke('get-dados-doutor', dados),
+    iniciarMarcacaoDeDataDeColetaParaExame: (dados) => ipcRenderer.invoke('iniciar-marcacao-de-data-de-coleta-para-exame', dados),
+    marcarDiaColetaDoExameGenerico: (dados) => ipcRenderer.invoke('marcar-dia-coleta-do-exame-generico', dados),
   }
   window.api = api
 }
