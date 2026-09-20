@@ -153,7 +153,7 @@ function Home() {
 					</div>
 				}
 
-				<img src={splash} style={{width: 300, height: "auto", position:"absolute", top: "50%", left: "50%", transform: "translate(-50%, -70%)"}}></img>
+				<img src={splash} style={{width: 300, height: "auto", position:"absolute", top: "40%", left: "50%", transform: "translate(-50%, -70%)"}}></img>
 			
 				{/* <button onClick={scripts.consoleLogCookies}>Cookies</button>
 				<button onClick={getDadosLogin}>Atualizar Sessao</button>
