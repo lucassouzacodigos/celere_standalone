@@ -149,7 +149,7 @@ function Home() {
 				: 
 					<div className="infoBox flex-center" style={{backgroundColor: "#0a0a0a", flexDirection: "row", justifyContent: "start"}} >
 					<Spinner/>
-					<p style={{marginLeft: "10px"}}>Aguardando Login</p>
+					<p style={{marginLeft: "10px"}}>Aguardando Login...</p>
 					</div>
 				}
 
