@@ -171,7 +171,9 @@ function Home() {
 
 					<p>Notas da Versão</p>
 					<p>v{version}_public</p>
-					<p style={{textAlign:"start"}}>Aba de Relatorios foi adicionada</p>
+					<p style={{textAlign:"start"}}>Função de agendamento de coleta(Beta) ja funcional, escolha o dia, o crm do
+						doutor que pediu o exame e CPF/CNS do paciente e clique no botao
+					</p>
 					
 				</div>
 
