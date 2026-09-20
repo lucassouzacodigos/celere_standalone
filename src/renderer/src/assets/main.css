@@ -871,9 +871,8 @@ button:disabled:hover {
 
 .analyticsRowDetails {
   display: grid;
-  grid-template-rows: 0fr;
-  opacity: 0;
-  transition: grid-template-rows 180ms ease, opacity 140ms ease;
+  grid-template-rows: 1fr;
+  opacity: 1;
 }
 
 .analyticsRowDetails > .analyticsDetails {

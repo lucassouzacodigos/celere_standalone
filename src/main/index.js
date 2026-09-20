@@ -301,7 +301,7 @@ app.whenReady().then(async () => {
     
     // console.log(json)
     // console.log(json[0])
-    console.log("texto: " + texto)
+    // console.log("texto: " + texto)
     // console.log("---------------")
     if (texto == "[]") {
       return "erro"
@@ -312,11 +312,80 @@ app.whenReady().then(async () => {
     
   })
 
+
+
+
+
+
+
+
+  // GET DADOS DO DOUTOR PELO CRM
+  ipcMain.handle('get-dados-doutor', async (event, dados) => {
+    const ses = session.fromPartition("persist:saude-session");
+
+
+    const response = await ses.fetch(
+      `${baseUrl}/celere.embudasartes/CompartilhadoProfissional/ListarProfissionalConselho`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Requested-With": "XMLHttpRequest"
+        },
+        body: JSON.stringify(dados)
+      }
+    );
+
+    const texto = await response.text();
+    return JSON.parse(JSON.parse(texto));
+  })
+
+
+
+
+
+
+
+
+  //get nome do paciente (geralmente para fins de logs)
+  ipcMain.handle('get-nome-do-paciente', async (event, dados) => {
+    const ses = session.fromPartition("persist:saude-session");
+
+    const cidadaoInfo = await ses.fetch(
+      `${baseUrl}/celere.embudasartes/CompartilhadoUsuario/BuscaUsuarioPorCartaoPesquisaUsuario`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Requested-With": "XMLHttpRequest"
+        },
+        body: JSON.stringify(dados)
+      }
+    );
+
+    const texto = await cidadaoInfo.text();
+    const json = JSON.parse(JSON.parse(texto));
+    
+    // console.log(json)
+    // console.log(json[0])
+    console.log("texto: " + texto)
+    // console.log("---------------")
+    if (texto == "[]") {
+      return "erro"
+    } else {
+      return json?.[0].NomUsuario
+    }
+    
+  })
+
+
+
+
   //AGENDAR INDIVIDUALMENTE UM USUARIO
   ipcMain.handle('agendar-usuario-por-cpfoucns', async (event, dados) => {
     const ses = session.fromPartition("persist:saude-session");
 
-    console.log("MAIN RECEBEU:", dados.seqAgenda);
+    // console.log("MAIN RECEBEU:", dados.seqAgenda);
     // console.log(JSON.stringify(dados, null, 2));
 
     const resposta = await ses.fetch(`${baseUrl}/celere.embudasartes/Pep/Agenda/MarcarConsulta`, {
@@ -340,6 +409,60 @@ app.whenReady().then(async () => {
     };
 
     })
+
+
+
+
+    //REQUEST INICIAL PARA PEGAR ALGUNS DADOS NECESSARIOS PARA O AGENDAMENTO DE COLETA DE EXAME
+    ipcMain.handle('iniciar-processo-agendamento-coleta', async (event, dados) => {
+      const ses = session.fromPartition("persist:saude-session");
+
+      const resposta = await ses.fetch(`${baseUrl}/celere.embudasartes/Pep/Recepcao/SalvarRecepcao`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-Requested-With": "XMLHttpRequest"
+          },
+          body: JSON.stringify(dados)
+        });
+
+        
+        const texto = await resposta.text()
+        return JSON.parse(JSON.parse(texto))
+      })
+
+
+
+
+
+    //AGENDAMENTO UNICO PARA COLETA DE EXAME COM EXAME GENERICO
+    ipcMain.handle('agendar-coleta-de-exame-generico', async (event, dados) => {
+      const ses = session.fromPartition("persist:saude-session");
+    
+      const resposta = await ses.fetch(`${baseUrl}/celere.embudasartes/Pep/SolicitacaoProcedimentos/SolicitarProcedimentos`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-Requested-With": "XMLHttpRequest"
+          },
+          body: JSON.stringify(dados)
+        });
+        const texto = await resposta.text()
+        return JSON.parse(JSON.parse(texto))
+      
+    
+    })
+
+
+
+
+
+
+
+
+
+
+
 
     ////LIMPAR LOGIN E DADOS DA SESSAO
   ipcMain.handle('limpar-sessao', async () => {

@@ -313,7 +313,7 @@ export default function ConsultarAgendas() {
             console.log("Agendado com sucesso, Adicionado ao log")
             //log
             const nomeProfissionalDonoDaAgenda = profissionais.find(agenda => agenda.value.split(",")[0] == profissionalId).texto.split(" - ")[0].trim()
-            addRegister(dadosFormatados.unidade, dadosFormatados?.nome, nomeProfissionalDonoDaAgenda, "Agendamento")
+            addRegister(dadosFormatados.unidade, dadosFormatados?.nome, nomeProfissionalDonoDaAgenda, "Agendamento", await getNomePorDocumento(documento))
         }
 
     }
@@ -331,6 +331,7 @@ export default function ConsultarAgendas() {
             return obj.SeqAgenda == seqAgendaDelete && 
             obj.CodParametroAgenda == codParametroAgenda
         })
+        console.log(objetoToDelete)
         // console.log(agendaCompletaParaDeletar)
 
 
@@ -355,7 +356,7 @@ export default function ConsultarAgendas() {
 
         //log
         const nomeProfissionalDonoDaAgenda = profissionais.find(agenda => agenda.value.split(",")[0] == profissionalId).texto.split(" - ")[0].trim()
-        addRegister(dadosFormatados.unidade, dadosFormatados?.nome, nomeProfissionalDonoDaAgenda, "Cancelamento")
+        addRegister(dadosFormatados.unidade, dadosFormatados?.nome, nomeProfissionalDonoDaAgenda, "Cancelamento", await getNomePorDocumento(objetoToDelete.NomUsuario))
 
         
         await verificarHorariosDoDia()
@@ -396,12 +397,40 @@ export default function ConsultarAgendas() {
         } else {
             return response?.CodUsuario
         }
-
-
-        console.log("Documento: ", documento, "| ID: ", response?.CodUsuario)
-        alert("Documento: " + documento + "| ID: " + response?.CodUsuario)
-        return response?.CodUsuario
     }
+    
+
+
+
+
+
+
+    //get nome do paciente
+    const getNomePorDocumento = async (documento) => {
+        const dados = {
+            "numeroCartaoSaude":documento,
+            "tipoPesquisa":0,
+            "session":FAST_SessionId
+        }
+        
+        const response = await window.electron.getUserIDByCNS(dados)
+        
+        if (response == "[]") {
+            console.log("cns = []")
+            return "[]"
+        } else {
+            return response?.NomUsuario
+        }
+    }
+
+
+
+
+
+
+
+
+
     
     const getDadosLogin = async () => {
         const FAST_SessionId = await window.electron.getFastMedicSession()
@@ -460,7 +489,10 @@ export default function ConsultarAgendas() {
         await window.electron.bloqueioADMUnico(dados)
         //log
         const nomeProfissionalDonoDaAgenda = profissionais.find(agenda => agenda.value.split(",")[0] == profissionalId).texto.split(" - ")[0].trim()
-        addRegister(dadosFormatados.unidade, dadosFormatados?.nome, nomeProfissionalDonoDaAgenda, "Bloqueio")
+        const bloqueioSelecionado = opcoesBloqueio.find((bloqueio) => (
+            String(bloqueio.value) === String(codTipoAgendamento)
+        ))
+        addRegister(dadosFormatados.unidade, dadosFormatados?.nome, nomeProfissionalDonoDaAgenda, "Bloqueio", bloqueioSelecionado?.text || String(codTipoAgendamento))
 
         await verificarHorariosDoDia()
     }
@@ -581,6 +613,7 @@ export default function ConsultarAgendas() {
             
             <div className='selectDias flex-center'>
                 <button onClick={verificarHorariosDoDia}>Consultar Hórarios</button>
+                {/* <button onClick={async() => console.log(await getNomePorDocumento("1"))}>Verificar Nome</button> */}
                 
                 <input className='inputData' type="date" value={data_selecionada.split("/").reverse().join("-")} onChange={(e) => {
                     const data = e.target.value; // yyyy-mm-dd

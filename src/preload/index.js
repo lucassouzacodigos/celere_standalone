@@ -37,6 +37,10 @@ if (process.contextIsolated) {
     getDadosFormatados: () => ipcRenderer.invoke('get-dados-formatados'),
     extrairTextoPdf: (pdfBuffer) => ipcRenderer.invoke('extrair-texto-pdf', pdfBuffer),
     closeElectron: () => ipcRenderer.invoke('close-electron'),
+    getNomeDoPaciente: (dados) => ipcRenderer.invoke('get-nome-do-paciente', dados),
+    AgendarColetaDeExameGenerico: (dados) => ipcRenderer.invoke('agendar-coleta-de-exame-generico', dados),
+    iniciarProcessoAgendamentoColeta: (dados) => ipcRenderer.invoke('iniciar-processo-agendamento-coleta', dados),
+    getDadosDoutor: (dados) => ipcRenderer.invoke('get-dados-doutor', dados),
   }
   window.api = api
 }

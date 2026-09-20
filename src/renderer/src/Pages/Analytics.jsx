@@ -26,6 +26,7 @@ export default function Analytics () {
         async function baixarLogs(){
             const dados = await getAllRegisters()
             setRegisters(dados)
+            console.log(dados)
         }
 
         baixarLogs()
@@ -86,7 +87,7 @@ export default function Analytics () {
                                     <span>{selectedMode?.label}</span>
                                 </div>
                                 <div className="analyticsRowUnit">
-                                    <span>Unidade</span>
+                                    <span>Unidade   </span>
                                     <strong>{item.unidade || "Não informada"}</strong>
                                 </div>
                             </div>
@@ -99,6 +100,10 @@ export default function Analytics () {
                                 <div>
                                     <dt>Responsável</dt>
                                     <dd>{item.quemAgendou || "Não informado"}</dd>
+                                </div>
+                                <div>
+                                    <dt>Paciente agendado</dt>
+                                    <dd>{item.pacienteAgendado || "Não informado"}</dd>
                                 </div>
                                 </dl>
                             </div>
