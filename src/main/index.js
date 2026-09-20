@@ -123,11 +123,11 @@ app.whenReady().then(async () => {
     loginWindow.webContents.on("did-finish-load", () => {
       // [REDACTED]
       loginWindow.webContents.executeJavaScript(`
-          document.querySelector("#inputUsuario").value = "44957764875"
+          document.querySelector("#inputUsuario").value = ""
         `)
 
       loginWindow.webContents.executeJavaScript(`
-          document.querySelector("#inputSenha").value = "uhjbnm321"
+          document.querySelector("#inputSenha").value = ""
         `)
     })
 
