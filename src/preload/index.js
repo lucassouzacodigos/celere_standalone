@@ -43,6 +43,8 @@ if (process.contextIsolated) {
     getDadosDoutor: (dados) => ipcRenderer.invoke('get-dados-doutor', dados),
     iniciarMarcacaoDeDataDeColetaParaExame: (dados) => ipcRenderer.invoke('iniciar-marcacao-de-data-de-coleta-para-exame', dados),
     marcarDiaColetaDoExameGenerico: (dados) => ipcRenderer.invoke('marcar-dia-coleta-do-exame-generico', dados),
+    getFilasPage: () => ipcRenderer.invoke('get-filas-page'),
+    simplePostRequest: (url, dados) => ipcRenderer.invoke('simple-post-request', url, dados),
   }
   window.api = api
 }

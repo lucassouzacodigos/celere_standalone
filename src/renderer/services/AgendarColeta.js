@@ -329,6 +329,49 @@ async function marcarDiaColetaDoExameGenerico(CodUsuario, dataParaColeta, NumAte
 
 
 
+//todas acima fazem parte do processo de marcar um procedimento generico
 
 
-export { fechar, AgendarColetaDeExameGenerico, iniciarMarcacaoDeDataDeColetaParaExame, iniciarProcessoAgendamentoColeta, getDadosDoutor, getDadosPaciente }
+
+
+
+async function getAgendaDeColetasDia(data){
+
+    
+    const fastMedicSession = await window.electron.getFastMedicSession()
+    const dadosAbrirAgendaColeta = await iniciarMarcacaoDeDataDeColetaParaExame(1)
+    
+
+    const dados = {
+        "codPostoColetaSelecionado": dadosAbrirAgendaColeta.Resultado.CodPostoColetaSelecionado,
+        "datSelecionada": data,
+        "session": fastMedicSession
+    }
+
+    const response = await window.electron.simplePostRequest("/celere.embudasartes/Pep/AgendamentoColetaExame/ListaUsuariosAgendados", dados)
+    const texto = (JSON.parse(JSON.parse(response)))
+    return texto
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export { fechar,
+        AgendarColetaDeExameGenerico,
+        iniciarMarcacaoDeDataDeColetaParaExame,
+        iniciarProcessoAgendamentoColeta,
+        getDadosDoutor,
+        getDadosPaciente,
+        getAgendaDeColetasDia
+    }

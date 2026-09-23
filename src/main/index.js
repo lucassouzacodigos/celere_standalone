@@ -17,7 +17,7 @@ const baseUrl = "https://sistema.saudepublica.digital"
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 1350,
+    width: 1400,
     height: 900,
     show: false,
     autoHideMenuBar: true,
@@ -629,6 +629,63 @@ app.whenReady().then(async () => {
 
 
 
+
+
+
+
+
+
+
+
+  //get na pagina de filas de atendimento
+  ipcMain.handle("get-filas-page", async (event) => {
+    const ses = session.fromPartition("persist:saude-session");
+    const response = await ses.fetch(`${baseUrl}/celere.embudasartes/Pep/Fila/FilaInicial`,  {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Requested-With": "XMLHttpRequest"
+      },
+    })
+    const resposta = await response.text()
+    return resposta
+  })
+
+
+  //REQUEST GENERICO DE POST, MANDA UM JSON, RECEBE UM JSON
+  ipcMain.handle("simple-post-request", async (event, url, dados) => {
+    
+    const ses = session.fromPartition("persist:saude-session");
+    const response = await ses.fetch(`${baseUrl}${url}`,  {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Requested-With": "XMLHttpRequest"
+      },
+      body: JSON.stringify(dados)
+    })
+
+    const resposta = await response.text()
+    return resposta
+  })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   //EXTRAIR TEXTOS DO PDF DO PEC
   ipcMain.handle('extrair-texto-pdf', async (event, dados) => {
     try {
@@ -644,7 +701,7 @@ app.whenReady().then(async () => {
   })
 
 
-  // FECHAR APP CASO
+  // FECHAR APP CASO KILLSWITCH ESTEJA ATIVO
   ipcMain.handle("close-electron", () => {
     app.quit()  
   })

@@ -10,6 +10,7 @@ import ConsultarAgendas from './Pages/ConsultarAgendas'
 import Testandopesquisa from './Pages/Testandopesquisa'
 import Analytics from './Pages/Analytics'
 import AgendarColeta from './Pages/AgendarColeta'
+import Filas from './Pages/Filas'
 
 
 const router = createHashRouter([
@@ -32,6 +33,10 @@ const router = createHashRouter([
   {
     path: 'Testandopesquisa',
     element: <Testandopesquisa />,
+  },
+  {
+    path: 'Filas',
+    element: <Filas />,
   },
   {
     path: 'Analytics',

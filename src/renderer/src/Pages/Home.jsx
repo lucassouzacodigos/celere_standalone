@@ -165,6 +165,7 @@ function Home() {
 				<button onClick={openLoginPage}>{dados? "Atualizar Login" : "Login"}</button>
 				<button onClick={() => navigate('/ConsultarAgendas')}>Agendar consultas</button>
 				<button onClick={() => navigate('/AgendarColetas')}>Agendar Coletas</button>
+				<button onClick={() => navigate('/Filas')}>Filas Atendimento</button>
 				{nome?.toLowerCase().includes("celere") && <button className='analyticsBtn' onClick={() => navigate('/Analytics')}>Relatorios</button>}
 
 				<div className='patchNotes'>
