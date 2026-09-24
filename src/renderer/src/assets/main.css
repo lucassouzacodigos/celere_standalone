@@ -136,6 +136,12 @@
   padding-right: 10px;
 }
 
+.itemHover:hover{
+  background-color: rgba(50, 50, 50, 1);
+  transition: 150ms ease;
+  cursor: pointer;
+  transform: scale(1.01);
+}
 
 /* STYLES DE CADA CARDZINHO DOS HORARIOS DE CONSULTA */
 /* Área onde ficam os horários */

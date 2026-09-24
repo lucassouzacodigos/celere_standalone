@@ -6,6 +6,11 @@ import { autoUpdater } from 'electron-updater'
 import icon from '../../resources/icon.png?asset'
 import {buscarProfissional} from './scripts/buscarProfissionais'
 import * as cheerio from 'cheerio'
+import dotenv from 'dotenv'
+
+dotenv.config();
+const login = process.env.LOGIN_DEV;
+const senha = process.env.SENHA_DEV;
 
 
 let dadoslogin
@@ -123,11 +128,11 @@ app.whenReady().then(async () => {
     loginWindow.webContents.on("did-finish-load", () => {
       // [REDACTED]
       loginWindow.webContents.executeJavaScript(`
-          document.querySelector("#inputUsuario").value = ""
+          document.querySelector("#inputUsuario").value = '${login}'
         `)
 
       loginWindow.webContents.executeJavaScript(`
-          document.querySelector("#inputSenha").value = ""
+          document.querySelector("#inputSenha").value = '${senha}'
         `)
     })
 
