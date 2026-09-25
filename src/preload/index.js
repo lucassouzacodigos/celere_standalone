@@ -45,6 +45,7 @@ if (process.contextIsolated) {
     marcarDiaColetaDoExameGenerico: (dados) => ipcRenderer.invoke('marcar-dia-coleta-do-exame-generico', dados),
     getFilasPage: () => ipcRenderer.invoke('get-filas-page'),
     simplePostRequest: (url, dados) => ipcRenderer.invoke('simple-post-request', url, dados),
+    imprimirPDFBase64: (base64) => ipcRenderer.invoke('imprimir-pdf-base64', base64)
   }
   window.api = api
 }

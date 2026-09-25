@@ -165,11 +165,11 @@ async function tirarDaFila(dadosPacienteNaFila){
 
     const dados = {
         "atendimento": {
-            "CodFcesAtendimento": 238,
-            "NumAtendimento": 35455,
-            "SeqItemAtendimento": 2,
-            "CodUsuario": 1,
-            "CodAcaoDestino": 5
+            "CodFcesAtendimento": dadosPacienteNaFila.CodFcesAtendimento,
+            "NumAtendimento": dadosPacienteNaFila.NumAtendimento,
+            "SeqItemAtendimento": dadosPacienteNaFila.SeqItemAtendimento,
+            "CodUsuario": dadosPacienteNaFila.CodUsuario,
+            "CodAcaoDestino": dadosPacienteNaFila.CodAcaoDestino
         },
         "motivo": "..........................",
         "codMotivoEncerramento": "1",

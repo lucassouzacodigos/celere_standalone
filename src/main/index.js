@@ -7,6 +7,13 @@ import icon from '../../resources/icon.png?asset'
 import {buscarProfissional} from './scripts/buscarProfissionais'
 import * as cheerio from 'cheerio'
 import dotenv from 'dotenv'
+import fs from "node:fs";
+import path from "node:path";
+import os from "node:os";
+import { pathToFileURL } from "node:url";
+
+
+
 
 dotenv.config();
 const login = process.env.LOGIN_DEV;
@@ -18,6 +25,69 @@ let mainWindow
 let dadosLoginFormatados
 
 const baseUrl = "https://sistema.saudepublica.digital"
+
+
+
+
+
+
+
+
+//janela do pdf
+async function imprimirPdfBase64(base64) {
+    const pdfPath = path.join(
+        os.tmpdir(),
+        `relatorio-${Date.now()}.pdf`
+    );
+
+    const pdfBase64 = base64
+        // .replace(/^data:application\/pdf;base64,/, "")
+        // .replace(/\s/g, "");
+
+    fs.writeFileSync(
+        pdfPath,
+        Buffer.from(pdfBase64, "base64")
+    );
+
+
+    const pdfWindow = new BrowserWindow({
+        width: 900,
+        height: 700,
+        show: true
+    });
+
+    await pdfWindow.loadURL(
+        pathToFileURL(pdfPath).toString()
+    );
+
+    pdfWindow.webContents.on("did-finish-load", () => {
+        pdfWindow.webContents.print({
+            silent: false,
+            printBackground: true
+        });
+    });
+
+    pdfWindow.on("closed", () => {
+        try {
+            fs.unlinkSync(pdfPath);
+        } catch (error) {
+            console.error(
+                "Erro ao apagar PDF temporário:",
+                error
+            );
+        }
+    });
+}
+
+
+
+
+
+
+
+
+
+
 
 function createWindow() {
   // Create the browser window.
@@ -88,6 +158,10 @@ app.whenReady().then(async () => {
   ipcMain.handle('get-dados-formatados', () => {
     return dadosLoginFormatados
   })
+
+  ipcMain.handle("imprimir-pdf-base64", async (_, base64) => {
+    return await imprimirPdfBase64(base64);
+  });
 
 
 
@@ -669,6 +743,8 @@ app.whenReady().then(async () => {
       },
       body: JSON.stringify(dados)
     })
+
+    
 
     const resposta = await response.text()
     return resposta

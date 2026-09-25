@@ -1,6 +1,7 @@
 import HomeButton from "../components/HomeButton";
 import * as coletasControler from "../../services/AgendarColeta.js"
 import * as filaControler from "../../services/FilaControler.js"
+import * as acoesDaFilaControler from "../../services/AcoesDaFilaControler.js"
 import { useEffect, useState } from "react";
 import "../assets/main.css"
 
@@ -34,6 +35,16 @@ export default function Filas(){
         setFilaAtualRender(response)
     }
 
+    const handleGerarPdfUltimoProntuario = async (CodUsuario) => {
+        const response = await acoesDaFilaControler.preparaRelatorio(CodUsuario)
+        await window.electron.imprimirPDFBase64(response)
+        
+    }
+
+    const handleTirarPacientedaFila = async (dadosPacienteNaFila) => {
+        await filaControler.tirarDaFila(dadosPacienteNaFila)
+    }
+
 
 
 
@@ -56,7 +67,10 @@ export default function Filas(){
 
             </div>
 
-            <button onClick={async() => filaControler.tirarDaFila()}></button>
+            
+            {/* <button onClick={async() => console.log(setTeste(await acoesDaFilaControler.preparaRelatorio(1)))}></button>
+            <button onClick={() => console.log(teste)}>consolelog teste use staute</button> 
+            <button onClick={async() => await window.electron.imprimirPDFBase64(teste)}>PDFFFFF</button> */}
 
             {/* CONTEUDO FILAS */}
             <div className="configs filas" style={{height: "90%", width: "70%",  margin:5, overflowY: "auto", border: "1px solid green"}}>
@@ -64,6 +78,7 @@ export default function Filas(){
                     (paciente, idx) => {
                         const prio = paciente.CorPriorizacaoFila?.split(":")[1]?.replace(";", "50")
                         const elementosNome = paciente.NomUsuario.split("-")
+                        const pacientecontext = paciente
                         return(
                             <div className="itemHover" key={idx} style={{flexDirection:"row"}}>
                                 <div style={{backgroundColor: prio ?? "#7070704b", margin:5, borderRadius:5, padding:5, fontWeight: "bold", color: "#ffffffc9", display: "flex", flexDirection:"row"}} >
@@ -82,6 +97,8 @@ export default function Filas(){
                                     <span style={{marginLeft: 5, backgroundColor: "", width: "10%", alignSelf: "center"}}>{elementosNome[3]??""}</span>
                                     {elementosNome[4] && <span style={{marginLeft: 5, backgroundColor: "", width: "auto", }}>{elementosNome[4]}</span>}
                                     {elementosNome[5] && <span style={{marginLeft: 5, backgroundColor: "", width: "auto"}}>{elementosNome[5]}</span>}
+                                    {/* <button onClick={() => handleTirarPacientedaFila(paciente)}>deletarfila</button> */}
+                                    <button onClick={() => handleGerarPdfUltimoProntuario(paciente.CodUsuario)}>Imprimir ficha</button>
                                 </div>
                             </div>
                         )
