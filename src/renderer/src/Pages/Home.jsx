@@ -173,7 +173,10 @@ function Home() {
 					<p>Notas da Versão</p>
 					<p>v{version}_public</p>
 					<p style={{textAlign:"start"}}>Função de agendamento de coleta(Beta) ja funcional, escolha o dia, o crm do
-						doutor que pediu o exame e CPF/CNS do paciente e clique no botao
+						doutor que pediu o exame e CPF/CNS do paciente e clique no botao, Novo icone da area de trabalho.
+						<br></br>
+						ja é possivel ver as filas, abrir o ultimo prontuario e gerar o pdf do ultimo prontuario em um botao,
+						tambem é possivel deletar os pacientes da fila diretamente do aplicativo.
 					</p>
 					
 				</div>
