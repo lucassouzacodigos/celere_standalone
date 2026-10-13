@@ -16,8 +16,8 @@ import { pathToFileURL } from "node:url";
 
 
 dotenv.config();
-const login = process.env.LOGIN_DEV;
-const senha = process.env.SENHA_DEV;
+const login = process.env.LOGIN_DEV || "";
+const senha = process.env.SENHA_DEV || "";
 
 
 let dadoslogin
