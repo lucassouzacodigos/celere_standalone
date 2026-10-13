@@ -124,6 +124,7 @@ export default function ConsultarAgendas() {
     const [opcoesBloqueio , setOpcoesBloqueio] = useState([])
     const [idBloqueio, setIdBloqueio] = useState(10)
     const [dadosFormatados, setDadosFormatados] = useState({})
+    const [nomeArquivoPdf, setNomeArquivoPdf] = useState("")
     const bloqueioRef = useRef(null)
     const deletarRef = useRef(null)
     const agendarRef = useRef(null)
@@ -165,6 +166,7 @@ export default function ConsultarAgendas() {
 
         for (const bloco of blocos) {
             const cns = bloco[0].match(/CNS:\s*(\d{15})/i)?.[1]
+                || (bloco[0].match(/CNS:\s*N[aã]o informado/i) ? "Não informado" : null)
             if (cns) cnsPorHorario[bloco[1]] = cns
         }
 
@@ -176,6 +178,7 @@ export default function ConsultarAgendas() {
         event.target.value = ""
         if (!file) return
 
+        setNomeArquivoPdf(file.name)
         setHorarios([])
         setCnsParaAgendar({})
         setErrosAgendamento({})
@@ -223,12 +226,18 @@ export default function ConsultarAgendas() {
             })
 
             const cnsPorSeqAgenda = {}
+            const errosPorSeqAgenda = {}
             resposta.forEach((horario) => {
                 const cns = dadosPdf.cnsPorHorario[horaDoHorario(horario)]
-                if (cns) cnsPorSeqAgenda[horario.seqAgenda] = cns
+                if (cns === "Não informado") {
+                    errosPorSeqAgenda[horario.seqAgenda] = cns
+                } else if (cns) {
+                    cnsPorSeqAgenda[horario.seqAgenda] = cns
+                }
             })
 
             setCnsParaAgendar(cnsPorSeqAgenda)
+            setErrosAgendamento(errosPorSeqAgenda)
             setHorarios(resposta)
         } catch (error) {
             alert(error.message)
@@ -261,7 +270,7 @@ export default function ConsultarAgendas() {
             horario.codParametroAgenda
         );
 
-        await sleep(150);
+        await sleep(20);
     }
 
     await verificarHorariosDoDia()
@@ -627,9 +636,24 @@ export default function ConsultarAgendas() {
 
             </div>
 
-            <button type="button" onClick={() => inputPdfRef.current?.click()}>
-                Importar PDF
-            </button>
+            <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}>
+                <button type="button" onClick={() => inputPdfRef.current?.click()}>
+                    Importar PDF
+                </button>
+                {nomeArquivoPdf && (
+                    <span
+                        title={nomeArquivoPdf}
+                        style={{
+                            maxWidth: "60vw",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                        }}
+                    >
+                        {nomeArquivoPdf}
+                    </span>
+                )}
+            </div>
             <input
                 ref={inputPdfRef}
                 type="file"
