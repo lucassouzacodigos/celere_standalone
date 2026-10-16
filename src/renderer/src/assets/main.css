@@ -1204,6 +1204,6 @@ button:disabled:hover {
   border-radius: 5px;
 
   box-shadow:
-    0 10px 25px rgba(0, 0, 0, 0.35),
+    0 10px 25px rgba(0, 0, 0, 0.36),
     0 4px 8px rgba(0, 0, 0, 0.2);
 }
