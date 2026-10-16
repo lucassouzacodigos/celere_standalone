@@ -5,6 +5,19 @@ import HomeButton from '../components/HomeButton.jsx'
 import Spinner from '../components/Spinner.jsx'
 import splash from '../assets/celeresplash2.gif'
 import { testForKillSwitch } from '../../services/dbcursor.js'
+import "../assets/main.css"
+
+
+
+//informações da versao
+const patchNotesGreen = [
+	"Quando um PDF é importado, o programa agora avisa se algum paciente não tem CNS cadastrado no PEC.",
+	"Quando um profissional tem mais de uma agenda, ao importar o pdf, o sistema agora pergunta em qual agenda serao inseridos os agendamentos"
+]
+
+const patchNotesRed = []
+
+
 
 
 function Home() {
@@ -170,11 +183,28 @@ function Home() {
 
 				<div className='patchNotes'>
 
-					<p>Notas da Versão</p>
-					<p>v{version}_public</p>
-					<p style={{textAlign:"start"}}>hotfix: quando um pdf é lido pelo função de importar pdf, caso algum Paciente
-						nao tenha cns no PEC, o programa agora avisa de antemão
-					</p>
+					<p className='patchNotesTitle'>Versão {version}_public</p>
+
+					<section className='patchNotesSection patchNotesRed'>
+						<h2>Remoções e alterações</h2>
+						<ul>
+							{patchNotesRed.length === 0 && (
+								<li className='patchNotesEmpty'>Sem remoções nesta versão.</li>
+							)}
+							{patchNotesRed.map((item, index) => (
+								<li key={`remocao-${index}`}>{item}</li>
+							))}
+						</ul>
+					</section>
+
+					<section className='patchNotesSection patchNotesGreen'>
+						<h2>Adições e correções</h2>
+						<ul>
+							{patchNotesGreen.map((item, index) => (
+								<li key={`adicao-${index}`}>{item}</li>
+							))}
+						</ul>
+					</section>
 					
 				</div>
 

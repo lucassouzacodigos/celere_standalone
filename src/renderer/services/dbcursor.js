@@ -26,7 +26,7 @@ async function getAllRegisters() {
     const querySnapshot = await getDocs(query(
         collection(db, "agendamentos"),
         orderBy("createdAt", "desc"),
-        limit(100)
+        limit(500)
     ));
     const agendamentos = [];
     querySnapshot.forEach((doc) => {

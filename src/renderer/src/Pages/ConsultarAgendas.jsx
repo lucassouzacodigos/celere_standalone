@@ -125,11 +125,13 @@ export default function ConsultarAgendas() {
     const [idBloqueio, setIdBloqueio] = useState(10)
     const [dadosFormatados, setDadosFormatados] = useState({})
     const [nomeArquivoPdf, setNomeArquivoPdf] = useState("")
+    const [profissionaisDuplicados, setProfissionaisDuplicados] = useState([])
     const bloqueioRef = useRef(null)
     const deletarRef = useRef(null)
     const agendarRef = useRef(null)
     const atualizarRef = useRef(null)
     const inputPdfRef = useRef(null)
+    const resolverEscolhaProfissionalRef = useRef(null)
     
     const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -150,6 +152,19 @@ export default function ConsultarAgendas() {
 
     function horaDoHorario(horario) {
         return horario?.hora?.match(/\d{2}:\d{2}/)?.[0] || ""
+    }
+
+    function escolherProfissionalDuplicado(opcoes) {
+        return new Promise((resolve) => {
+            resolverEscolhaProfissionalRef.current = resolve
+            setProfissionaisDuplicados(opcoes)
+        })
+    }
+
+    function resolverEscolhaProfissional(profissional) {
+        resolverEscolhaProfissionalRef.current?.(profissional)
+        resolverEscolhaProfissionalRef.current = null
+        setProfissionaisDuplicados([])
     }
 
     function extrairDadosPdf(texto) {
@@ -191,21 +206,30 @@ export default function ConsultarAgendas() {
                 throw new Error(resultado?.erro || "Não foi possível extrair o texto do PDF.")
             }
 
+
             const dadosPdf = extrairDadosPdf(resultado.texto)
             if (!dadosPdf.data || !dadosPdf.profissional) {
                 throw new Error("Não foi possível identificar a data e o profissional no PDF.")
             }
 
-            setData_selecionada(dadosPdf.data)
-            const profissionalEncontrado = profissionais.find((profissional) => {
+            const profissionaisEncontrados = profissionais.filter((profissional) => {
                 const nomeSelect = profissional.texto.split(" - ")[0]
                 return normalizarNome(nomeSelect) === normalizarNome(dadosPdf.profissional)
             })
 
-            if (!profissionalEncontrado) {
+            if (profissionaisEncontrados.length === 0) {
                 throw new Error(`O profissional "${dadosPdf.profissional}" não foi encontrado no select.`)
             }
 
+            const profissionalEncontrado = profissionaisEncontrados.length === 1
+                ? profissionaisEncontrados[0]
+                : await escolherProfissionalDuplicado(profissionaisEncontrados)
+
+            if (!profissionalEncontrado) {
+                return
+            }
+
+            setData_selecionada(dadosPdf.data)
             const [id, tipo, cbo] = profissionalEncontrado.value.split(",")
             setProfissionalId(id)
             setTipoAgenda(tipo)
@@ -545,8 +569,7 @@ export default function ConsultarAgendas() {
     useEffect(() => {
         async function carregar() {
             await getDadosLogin()
-            const dados =
-            await window.electron.consultarProfissionaisComAgendas();
+            const dados = await window.electron.consultarProfissionaisComAgendas();
             
             setProfissionais(dados);
             const dadosFormatados = await window.electron.getDadosFormatados()
@@ -588,6 +611,42 @@ export default function ConsultarAgendas() {
 
         <HomeButton />
 
+        {profissionaisDuplicados.length > 0 && (
+            <div className="selecaoProfissionalOverlay">
+                <section
+                    className="selecaoProfissionalModal"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="titulo-selecao-profissional"
+                >
+                    <h2 id="titulo-selecao-profissional">Escolha o profissional</h2>
+                    <p>Há mais de uma agenda para este nome. Selecione a opção correta:</p>
+                    <div className="selecaoProfissionalOpcoes">
+                        {profissionaisDuplicados.map((profissional, index) => {
+                            const [id, tipo, cbo] = profissional.value.split(",")
+                            return (
+                                <button
+                                    key={`${profissional.value}-${index}`}
+                                    type="button"
+                                    className="selecaoProfissionalOpcao"
+                                    onClick={() => resolverEscolhaProfissional(profissional)}
+                                >
+                                    <span>{profissional.texto}</span>
+                                    <small>ID: {id} | Agenda: {tipo} | CBO: {cbo}</small>
+                                </button>
+                            )
+                        })}
+                    </div>
+                    <button
+                        type="button"
+                        className="selecaoProfissionalCancelar"
+                        onClick={() => resolverEscolhaProfissional(null)}
+                    >
+                        Cancelar importação
+                    </button>
+                </section>
+            </div>
+        )}
 
         {Object.entries(errosAgendamento).map(([seqAgenda, documento]) => {
             const horario = horarios?.find(
