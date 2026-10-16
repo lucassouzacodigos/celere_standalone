@@ -4,11 +4,13 @@ import { useEffect, useState } from 'react'
 import * as scripts from '../../main/scripts/scripts.js'
 import { useNavigate } from 'react-router-dom'
 import logo from './assets/celerelogo.png'
+import Spinner from './components/Spinner.jsx'
 
 function App() {
   const ipcHandle = () => window.electron.ipcRenderer.send('ping')
   const navigate = useNavigate()
   
+  const [carregando, setCarregando] = useState(false)
   const [animate, setAnimate] = useState(false)
   const [teste, setTeste] = useState()
   const [dados, setDados] = useState()
@@ -54,10 +56,20 @@ function App() {
     getDadosLogin()
     setTimeout(() => {
       setAnimate(true)
-    }, 250);
+    }, 450);
   }, [])
 
 
+
+
+
+  const handleStart = () => {
+    setCarregando(true)
+    setTimeout(() => {
+      navigate("/home")
+    }, 450);
+    
+  }
 
 
 
@@ -71,7 +83,7 @@ function App() {
         </div>
 
         {/* <div style={{color: "#fff"}}>SEJA BEM VINDO!!!</div> */}
-        <button onClick={() => navigate("/home")} className={animate ? "titulopadraoanimado" : "titulopadrao"}>Começar</button>
+        <button style={{display:"flex", alignItems:"center", justifyContent:"center"}} onClick={handleStart} className={animate ? "titulopadraoanimado" : "titulopadrao"}>{carregando ? <Spinner /> : "Começar"}</button>
 
       </div>
     </div>
