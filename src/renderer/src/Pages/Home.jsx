@@ -148,7 +148,7 @@ function Home() {
 
 			<HomeButton/>
 			
-			<div className="mainmenu flex-center">
+			<div className="mainmenu flex-center" style={{height: "80%", width: "100%", borderRadius: "0"}}>
 
 
 

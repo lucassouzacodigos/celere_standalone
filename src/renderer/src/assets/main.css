@@ -60,14 +60,40 @@
 
 .mainmenu{
   position: relative;
-  border-radius: 10px;
-  height: 500px;
-  width: 100%;
+  border-radius: 500px;
+  height: 0%;
+  width: 0%;
   background-color: #1f1f1f;
   color: #000;
   text-align: center;
   flex-direction: column;
 }
+
+.mainmenuAnimation{
+  position: relative;
+  border-radius: 10px;
+  height: 100%;
+  width: 100%;
+  background-color: #57c46e;
+  color: #000;
+  text-align: center;
+  flex-direction: column;
+  border-radius: 0px;
+  transition: height 700ms cubic-bezier(0.9, 0, 0.2, 1),
+              width 900ms cubic-bezier(0.9, 0, 0.2, 1),
+              border-radius 1250ms cubic-bezier(0.85, 0, 0.2, 1);
+}
+
+.titulopadrao{
+  opacity: 0;
+}
+
+.titulopadraoanimado{
+  opacity: 1;
+  transition: opacity 2000ms cubic-bezier(0.9, 0, 0.2, 1);
+}
+
+
 
 .infoBox{
   position: absolute;

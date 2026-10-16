@@ -41,7 +41,11 @@ const router = createHashRouter([
   {
     path: 'Analytics',
     element: <Analytics />,
-  }
+  },
+  {
+    path: 'eat',
+    element: <App />,
+  },
 
 ])
 

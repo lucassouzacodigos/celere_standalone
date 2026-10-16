@@ -9,6 +9,7 @@ function App() {
   const ipcHandle = () => window.electron.ipcRenderer.send('ping')
   const navigate = useNavigate()
   
+  const [animate, setAnimate] = useState(false)
   const [teste, setTeste] = useState()
   const [dados, setDados] = useState()
   const [FAST_SessionId, setFAST_SessionId] = useState("")
@@ -51,6 +52,9 @@ function App() {
 
   useEffect(() => {
     getDadosLogin()
+    setTimeout(() => {
+      setAnimate(true)
+    }, 250);
   }, [])
 
 
@@ -59,16 +63,15 @@ function App() {
 
   return (
     <div className="container">
-      
-      <div className="mainmenu flex-center" style={{backgroundColor: "#57c46e"}}>
+      <div className={animate ? "mainmenuAnimation flex-center" : "mainmenu"} >
 
         <div className='flex-center' style={{backgroundColor:""}}>
-          <img src={logo} style={{transform: "translateX(-10px)"}} className="logo" alt="" />
-          <p style={{color:"black", fontSize: "35px", fontWeight: "bold"}} >CÉLERE</p>
+          <img src={logo} style={{transform: "translateX(-10px)"}} className={animate ? "titulopadraoanimado logo" : "titulopadrao"} alt="" />
+          <p style={{color:"black", fontSize: "35px", fontWeight: "bold"}} className={animate ? "titulopadraoanimado" : "titulopadrao"} >CÉLERE</p>
         </div>
 
         {/* <div style={{color: "#fff"}}>SEJA BEM VINDO!!!</div> */}
-        <button onClick={() => navigate("/home")}>Começar</button>
+        <button onClick={() => navigate("/home")} className={animate ? "titulopadraoanimado" : "titulopadrao"}>Começar</button>
 
       </div>
     </div>
