@@ -9,6 +9,7 @@ import { AnimatePresence, motion } from "motion/react"
 import { Lock, SaveAll, Trash2, UserSearch, LockKeyhole } from "lucide-react"
 import ResultadosPesquisaModal from "../components/ResultadoPesquisaModal/ResultadosPesquisaModal"
 import { addRegister } from "../../services/dbcursor"
+import * as cadastroControler from "../../services/cadastroControler"
 
 const HorarioAgenda = memo(function HorarioAgenda({
     horario,
@@ -126,6 +127,7 @@ export default function ConsultarAgendas() {
     const [dadosFormatados, setDadosFormatados] = useState({})
     const [nomeArquivoPdf, setNomeArquivoPdf] = useState("")
     const [profissionaisDuplicados, setProfissionaisDuplicados] = useState([])
+    const [repostaCadastro, setRepostaCadastro] = useState("")
     const bloqueioRef = useRef(null)
     const deletarRef = useRef(null)
     const agendarRef = useRef(null)
@@ -294,7 +296,7 @@ export default function ConsultarAgendas() {
             horario.codParametroAgenda
         );
 
-        await sleep(20);
+        await sleep(10);
     }
 
     await verificarHorariosDoDia()
@@ -647,18 +649,20 @@ export default function ConsultarAgendas() {
                 </section>
             </div>
         )}
-
+                            <p>{repostaCadastro}</p>
         {Object.entries(errosAgendamento).map(([seqAgenda, documento]) => {
             const horario = horarios?.find(
                 h => String(h.seqAgenda) === String(seqAgenda)
             )
-
+            
             return (
-                <li key={seqAgenda}>
-                    {horario?.hora} — CNS: {documento}
+                
+                <li key={seqAgenda} style={{minWidth:400, backgroundColor:"transparent", margin:5, display:"flex", justifyContent:"space-between"}}>
+                    {horario?.hora} — CNS: {documento} <div onClick={() => setRepostaCadastro(cadastroControler.CadastrarUsuarioCNS(documento))} style={{cursor:"pointer", backgroundColor:"green", padding:5}}>Tentar Cadastrar</div>
                 </li>
             )
         })}
+        
 
         <div className='configs flex-center' style={{}}> 
             
@@ -669,7 +673,7 @@ export default function ConsultarAgendas() {
 
             {/* BOTOES */}
             {/* <button onClick={consultarProfissionaisComAgendas}>pagina consultar agendas</button> */}
-            
+                
             {/* metadados */}
             <div className='metadados'>
                 Metadados:
@@ -682,6 +686,7 @@ export default function ConsultarAgendas() {
             <div className='selectDias flex-center'>
                 <button onClick={verificarHorariosDoDia}>Consultar Hórarios</button>
                 {/* <button onClick={async() => console.log(await getNomePorDocumento("1"))}>Verificar Nome</button> */}
+
                 
                 <input className='inputData' type="date" value={data_selecionada.split("/").reverse().join("-")} onChange={(e) => {
                     const data = e.target.value; // yyyy-mm-dd
@@ -690,10 +695,14 @@ export default function ConsultarAgendas() {
                 }}
                 ></input>
 
-                
+                {/* <button onClick={async() => await cadastroControler.CadastrarUsuarioCNS(706402125892480)}>Test cadastro</button> */}
+
+               
 
 
             </div>
+
+            
 
             <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap" }}>
                 <button type="button" onClick={() => inputPdfRef.current?.click()}>
