@@ -87,7 +87,7 @@ function Home() {
 		const killswitch = await testForKillSwitch()
 
 		if (killswitch.KillSwitch == true){
-			alert("Kill Switch foi ativada, contate o suporte.")
+			alert(killswitch.message || "Kill Switch foi ativada, contate o suporte.")
 			window.electron.closeElectron()
 			return
 		}

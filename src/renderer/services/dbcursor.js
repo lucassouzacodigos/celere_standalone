@@ -1,6 +1,6 @@
 
 
-import {addDoc, collection, getDocs, getDoc, doc, limit, orderBy, query, } from "firebase/firestore";
+import {addDoc, collection, getDocs, getDoc, getCountFromServer, doc, limit, orderBy, query, } from "firebase/firestore";
 import db from "./firebase"
 
 
@@ -23,22 +23,33 @@ async function addRegister(unidade, quemAgendou, agendadoPara, tipoAcao, pacient
 } 
 
 async function getAllRegisters() {
-    const querySnapshot = await getDocs(query(
+    const registersQuery = query(
         collection(db, "agendamentos"),
         orderBy("createdAt", "desc"),
-        limit(500)
-    ));
+        limit(750)
+    );
+    const [querySnapshot, countSnapshot] = await Promise.all([
+        getDocs(registersQuery),
+        getCountFromServer(collection(db, "agendamentos"))
+    ]);
     const agendamentos = [];
     querySnapshot.forEach((doc) => {
         agendamentos.push(doc.data());
     });
-    return agendamentos;
+    return {
+        registers: agendamentos,
+        totalCount: countSnapshot.data().count
+    };
 }
 
 
 async function testForKillSwitch(){
     const querySnapshot = await getDoc(doc(db, "KillSwitch", "KillSwitch"));
-    return querySnapshot.data()
+    const data = querySnapshot.data();
+    return {
+        KillSwitch: data?.KillSwitch,
+        message: data?.message
+    };
 }
 
 

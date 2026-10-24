@@ -20,12 +20,14 @@ function getRegisterDate(register) {
 
 export default function Analytics () {
     const [registers, setRegisters] = useState([])
+    const [totalRegistrers, setTotalRegisters] = useState(0)
     const [selectedAction, setSelectedAction] = useState("Agendamento")
 
     useEffect(() => {
         async function baixarLogs(){
             const dados = await getAllRegisters()
-            setRegisters(dados)
+            setRegisters(dados.registers)
+            setTotalRegisters(dados.totalCount)
             console.log(dados)
         }
 
@@ -47,6 +49,10 @@ export default function Analytics () {
                         <span className="analyticsEyebrow">Central de registros</span>
                         <h1>Relatórios de atividade</h1>
                         <p>Consulte os eventos registrados por unidade e período.</p>
+                    </div>
+                    <div className="analyticsCount" aria-live="polite">
+                        <strong>{totalRegistrers}</strong>
+                        <span>Total de Agendamentos</span>
                     </div>
                     <div className="analyticsCount" aria-live="polite">
                         <strong>{visibleRegisters.length}</strong>
