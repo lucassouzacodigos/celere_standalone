@@ -299,7 +299,7 @@ app.whenReady().then(async () => {
     const select =  $("#ConsultaAgendamento_ControlComboProfissional")
 
     // console.log(select.html())
-    // console.log(select.attr("id,."))
+    // console.log(select.attr("id,.d"))
     
     const profissionais = [];
 
