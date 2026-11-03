@@ -23,6 +23,7 @@ const senha = process.env.SENHA_DEV || "";
 let dadoslogin
 let mainWindow
 let dadosLoginFormatados
+let hasUpdate = false
 
 const baseUrl = "https://sistema.saudepublica.digital"
 
@@ -128,8 +129,13 @@ function createWindow() {
 app.whenReady().then(async () => {
   autoUpdater.autoDownload = true
 
+  autoUpdater.on('update-available', () => {
+    hasUpdate = true
+  })
+
   autoUpdater.on('update-downloaded', () => {
     autoUpdater.quitAndInstall()
+
   })
 
   await autoUpdater.checkForUpdates()
@@ -389,6 +395,16 @@ app.whenReady().then(async () => {
     }
 
     
+  })
+
+
+  // RETORNA SE O GITHUB TEM ATUALIZAÇÕES
+  ipcMain.handle('has-update', async () => {
+    if (hasUpdate) {
+      return true
+    } else {
+      return false
+    }
   })
 
 

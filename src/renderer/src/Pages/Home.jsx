@@ -5,6 +5,7 @@ import HomeButton from '../components/HomeButton.jsx'
 import Spinner from '../components/Spinner.jsx'
 import splash from '../assets/celeresplash2.gif'
 import { testForKillSwitch } from '../../services/dbcursor.js'
+import HasUpdate from "./HasUpdate.jsx"
 import "../assets/main.css"
 
 
@@ -32,6 +33,7 @@ function Home() {
 	const [unidade, setUnidade] = useState()
 	const [subModulo, setSubModulo] = useState()
 	const [version, setVersion] = useState()
+	const [hasUpdate, setHasUpdate] = useState(false)
 
 
 	const [FAST_SessionId, setFAST_SessionId] = useState("")
@@ -134,13 +136,22 @@ function Home() {
 		})
 		async function getVersion() {
 			let version = await window.electron.getVersion()
+			let hasUpdate = await window.electron.hasUpdate()
 			setVersion(version)
+			setHasUpdate(hasUpdate)
 		}
 		getVersion()
 	}, [ocupacao])
 	
 	
 	
+	//return caso tenho att
+
+	if (hasUpdate){
+		return(
+			<HasUpdate/>
+		)
+	}
 	
 	
 	return (
