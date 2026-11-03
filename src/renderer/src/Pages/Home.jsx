@@ -145,7 +145,7 @@ function Home() {
 	
 	
 	
-	//return caso tenho att
+	//return caso tenho attt
 
 	if (hasUpdate){
 		return(
