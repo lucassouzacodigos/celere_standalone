@@ -134,7 +134,9 @@ app.whenReady().then(async () => {
   })
 
   autoUpdater.on('update-downloaded', () => {
-    autoUpdater.quitAndInstall()
+    setTimeout(() => {
+      autoUpdater.quitAndInstall()
+    }, 10000)
 
   })
 
