@@ -282,7 +282,7 @@ app.whenReady().then(async () => {
     const ses = session.fromPartition("persist:saude-session");
     const [cookie] = await ses.cookies.get({name: "FAST_SessionId"})
 
-    console.log(cookie?.value)
+    // console.log(cookie?.value)
     return cookie?.value ?? null
   })
 
@@ -299,7 +299,7 @@ app.whenReady().then(async () => {
     const select =  $("#ConsultaAgendamento_ControlComboProfissional")
 
     // console.log(select.html())
-    // console.log(select.attr("id"))
+    // console.log(select.attr("id,."))
     
     const profissionais = [];
 
@@ -475,7 +475,11 @@ app.whenReady().then(async () => {
         },
         body: JSON.stringify(dados)
       });
-      console.log("resposta MAIN: ", await resposta.text())
+
+      const parsed = await JSON.parse(JSON.parse(await resposta.text()))
+      console.log({"resultado": "Paciente Agendado",
+        "vaga": parsed.Resultado.seqAgenda,
+      })
 
       if (resposta.ok) {
       return {
