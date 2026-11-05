@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom'
 import HomeButton from '../components/HomeButton.jsx'
 import Spinner from '../components/Spinner.jsx'
 import splash from '../assets/celeresplash2.gif'
+import mel from '../assets/mel.png'
+import pedro from '../assets/pedro.png'
 import { testForKillSwitch } from '../../services/dbcursor.js'
 import HasUpdate from "./HasUpdate.jsx"
 import "../assets/main.css"
@@ -191,6 +193,24 @@ function Home() {
 				<button onClick={() => navigate('/AgendarColetas')}>Agendar Coletas</button>
 				<button onClick={() => navigate('/Filas')}>Filas Atendimento</button>
 				{nome?.toLowerCase().includes("celere") && <button className='analyticsBtn' onClick={() => navigate('/Analytics')}>Relatorios</button>}
+
+
+				{/* //EASTER EGGS */}
+				{/* //EASTER EGGS */}
+				{/* //EASTER EGGS */}
+				{
+					nome?.toLowerCase().includes("pedro camara") && 
+					<div style={{color:"white", display:"flex", justifyContent:"center", alignItems:"center", flexDirection:"row", height:"100%", width:"100%"}}>
+						<img src={mel} style={{height:200,width:200}}></img>
+						<p style={{fontSize:"80px"}}>♥</p>
+						<img src={pedro} style={{height:200,width:200}}></img>
+
+					</div>
+				}
+				{/* //EASTER EGGS */}
+				{/* //EASTER EGGS */}
+				{/* //EASTER EGGS */}
+
 
 				<div className='patchNotes'>
 
