@@ -274,6 +274,8 @@ export default function ConsultarAgendas() {
 
 
     const salvar = async () => {
+    setErrosAgendamento({})
+
     for (const horario of horarios) {
 
         // pula horários que já possuem usuário
