@@ -10,6 +10,7 @@ import { Lock, SaveAll, Trash2, UserSearch, LockKeyhole } from "lucide-react"
 import ResultadosPesquisaModal from "../components/ResultadoPesquisaModal/ResultadosPesquisaModal"
 import { addRegister } from "../../services/dbcursor"
 import * as cadastroControler from "../../services/cadastroControler"
+import SwitchMUI from "../components/SwitchMUI"
 
 const HorarioAgenda = memo(function HorarioAgenda({
     horario,
@@ -22,6 +23,7 @@ const HorarioAgenda = memo(function HorarioAgenda({
     deletarRef,
     agendarRef,
     atualizarRef,
+    compacto,
 }) {
     return (
         <motion.div
@@ -30,7 +32,7 @@ const HorarioAgenda = memo(function HorarioAgenda({
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.3 }}
         >
-            <div className="horarioHeader">
+            <div className="horarioHeader" style={{}}>
                 <p id="horaConsulta" style={{ margin: 2 }}>{horario.hora}</p>
 
                 {horario.usuario ? (
@@ -83,10 +85,13 @@ const HorarioAgenda = memo(function HorarioAgenda({
                 </button>
             </div>
 
-            <div className="horarioInfo">
-                <p><strong>Tipo:</strong> {horario.tipo || "—"}</p>
-                <p><strong>Observação:</strong> {horario.observacao || "—"}</p>
-            </div>
+            {
+                !compacto &&
+                <div className="horarioInfo">
+                    <p><strong>Tipo:</strong> {horario.tipo || "—"}</p>
+                    <p><strong>Observação:</strong> {horario.observacao || "—"}</p>
+                </div>
+            }
 
             {cns && !horario.usuario && isInputAtivo && (
                 <AnimatePresence>
@@ -101,12 +106,7 @@ const HorarioAgenda = memo(function HorarioAgenda({
             )}
         </motion.div>
     )
-}, (previous, next) => (
-    previous.horario === next.horario &&
-    previous.cns === next.cns &&
-    previous.isInputAtivo === next.isInputAtivo &&
-    previous.opcoesBloqueio === next.opcoesBloqueio
-))
+})
 
 export default function ConsultarAgendas() {
     const navigate = useNavigate()
@@ -114,6 +114,7 @@ export default function ConsultarAgendas() {
     const [profissionalSelecionado, setProfissionalSelecionado] = useState("");
     const [profissionalId, setProfissionalId] = useState("");
     const [tipoAgenda, setTipoAgenda] = useState("");
+    const [compacto, setCompacto] = useState(false);
     const [idCBOProfissional, setIdCBOProfissional] = useState("");
     const [horarios, setHorarios] = useState();
     const [FAST_SessionId, setFAST_SessionId] = useState("")
@@ -744,8 +745,12 @@ export default function ConsultarAgendas() {
             <div className="container-inferior-horarios">
             
                 <div className="horariosContainer" style={{}}>
-                    <div className="titulo-horarios">
-                        <p >Horarios: </p>
+                    <div className="titulo-horarios" style={{justifyContent: "space-between"}}>
+                        <p >Horarios: </p> 
+                        <div style={{flexDirection: "row", alignItems: "center"}}>
+                            <span style={{marginRight: 10}}>Modo compacto</span>
+                            <SwitchMUI checked={compacto} onChange={(e) => setCompacto(e.target.checked)} />
+                        </div>
                     </div>
                 {horarios &&
                     horarios.map((horario) => (
@@ -761,6 +766,7 @@ export default function ConsultarAgendas() {
                             deletarRef={deletarRef}
                             agendarRef={agendarRef}
                             atualizarRef={atualizarRef}
+                            compacto={compacto}
                         />
                     )) || "Selecione o profissional e a data"}
                 </div>
@@ -770,17 +776,28 @@ export default function ConsultarAgendas() {
                         <p>Erros:</p>
                     </div>
 
-                    <p>{respostaCadastro}</p>
+                    <div className="respostaCadastro">
+                        {respostaCadastro}
+                    </div>
                     {Object.entries(errosAgendamento).map(([seqAgenda, documento]) => {
                         const horario = horarios?.find(
                             h => String(h.seqAgenda) === String(seqAgenda)
                         )
                         
                         return (
-                            
-                            <li key={seqAgenda} style={{minWidth:400, backgroundColor:"transparent", margin:5, display:"flex", justifyContent:"space-between"}}>
-                                {horario?.hora} — CNS: {documento} <div onClick={() => setRespostaCadastro(cadastroControler.CadastrarUsuarioCNS(documento))} style={{cursor:"pointer", backgroundColor:"green", padding:5}}>Tentar Cadastrar</div>
-                            </li>
+                            <div className="erroAgendamentoBlock" key={seqAgenda}>
+                                <div className="erroAgendamentoInfo">
+                                    <p className="erroAgendamentoHora">{horario?.hora || "Horário não encontrado"}</p>
+                                    <p><strong>CNS:</strong> {documento}</p>
+                                </div>
+                                <button
+                                    type="button"
+                                    className="erroAgendamentoBotao"
+                                    onClick={() => setRespostaCadastro(cadastroControler.CadastrarUsuarioCNS(documento))}
+                                >
+                                    Tentar Cadastrar
+                                </button>
+                            </div>
                         )
                     })}
                 </div>

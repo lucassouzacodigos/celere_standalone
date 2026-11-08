@@ -369,6 +369,72 @@
   align-items: start;
 }
 
+.erroAgendamentoBlock {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  background: #292929;
+  border: 1px solid #444;
+  border-left: 2px solid #d9534f;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.erroAgendamentoInfo {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  min-width: 0;
+  color: #cfcfcf;
+}
+
+.erroAgendamentoInfo p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.erroAgendamentoInfo strong {
+  color: #fff;
+}
+
+.erroAgendamentoHora {
+  padding: 5px 8px;
+  background-color: #d9534f;
+  color: #fff;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.erroAgendamentoBotao {
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  background-color: green;
+  color: #000;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.respostaCadastro {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: 10px;
+  color: #cfcfcf;
+  background: #292929;
+  border: 1px solid #444;
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+  margin-top: 10px
+}
+
 
 .titulo-horarios{
   font-weight: bold;
@@ -391,8 +457,9 @@
 .horarioBlock {
   position: relative;
   width: auto;
-  min-height: 60px;
+  min-height: auto;
   height: auto;
+
 
   display: flex;
   flex-direction: column;
@@ -405,7 +472,7 @@
   border-radius: 8px;
 
   padding: 4px;
-  margin: 12px 0px;
+  /* margin: 4px 0px; */
 
 
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);

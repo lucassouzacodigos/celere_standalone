@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import HomeButton from '../components/HomeButton.jsx'
 import Spinner from '../components/Spinner.jsx'
 import splash from '../assets/celeresplash2.gif'
+import splash2 from '../assets/teste.gif'
 import { testForKillSwitch } from '../../services/dbcursor.js'
 import HasUpdate from "./HasUpdate.jsx"
 import "../assets/main.css"
@@ -186,7 +187,7 @@ function Home() {
 					</div>
 				}
 
-				<img src={splash} style={{width: 300, height: "auto", position:"absolute", top: "40%", left: "50%", transform: "translate(-50%, -70%)"}}></img>
+				<img src={splash2} style={{width: 450, height: "auto", position:"absolute", top: "40%", left: "50%", transform: "translate(-55%, -160%)"}}></img>
 			
 				{/* <button onClick={scripts.consoleLogCookies}>Cookies</button>
 				<button onClick={getDadosLogin}>Atualizar Sessao</button>

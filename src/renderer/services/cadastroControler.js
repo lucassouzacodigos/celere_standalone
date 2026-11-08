@@ -30,7 +30,7 @@ export async function CadastrarUsuarioCNS(cns){
         console.log("Usuario: " + parsed.Resultado.NomUsuario)
         console.log("CNS: " + parsed.Resultado.NumCartaoSaude)
         console.log("ID: " + parsed.Resultado.CodUsuario)
-        return parsed.Resultado.NomUsuario + "Cadastrado "
+        return parsed.Resultado.NomUsuario + " Cadastrado"
     } else {
         console.log(parsed.Mensagem)
         return parsed.Mensagem
