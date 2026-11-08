@@ -14,8 +14,7 @@ import EasterEggs from '../components/EasterEggs.jsx'
 
 //informações da versao
 const patchNotesGreen = [
-	"Quando um PDF é importado, o programa agora avisa se algum paciente não tem CNS cadastrado no PEC.",
-	"Quando um profissional tem mais de uma agenda, ao importar o pdf, o sistema agora pergunta em qual agenda serao inseridos os agendamentos"
+	"Melhorias visuais na pagina Agendar Consultas"
 ]
 
 const patchNotesRed = []
