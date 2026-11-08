@@ -22,7 +22,7 @@ export default function ResultadosPesquisaModal({ busca, agendar, seqAgenda, cod
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (busca.trim().length >= 3) {
+            if (busca.trim().length >= 3 && busca.includes(" ")) {
                 pesquisar(busca.trim())
             } else {
                 setResultadoPesquisa([])
@@ -102,10 +102,16 @@ export default function ResultadosPesquisaModal({ busca, agendar, seqAgenda, cod
                                 <span><small>Cartão SUS</small>{user.NumCartaoSaude || "Não informado"}</span>
                                 <span><small>CPF</small>{user.NumCPF || "Não informado"}</span>
                             </span>
+                            
                         </button>
                     ))
+                    
                     :
-                <Spinner />
+                    <div className="linhaResultado" style={{display:"flex", flexDirection:"row", justifyContent:"space-evenly", alignItems:"center", marginTop:0, height:45}}>
+                        <span className="resultadoCodigo">#000000</span>
+                        <Spinner /> <p><strong>Para pesquisar digite pelo menos 3 letras, um nome e sobrenome</strong></p>
+                    </div>
+                    
                 }
             </div>
         </motion.div>

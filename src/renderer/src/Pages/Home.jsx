@@ -4,11 +4,10 @@ import { useNavigate } from 'react-router-dom'
 import HomeButton from '../components/HomeButton.jsx'
 import Spinner from '../components/Spinner.jsx'
 import splash from '../assets/celeresplash2.gif'
-import mel from '../assets/mel.png'
-import pedro from '../assets/pedro.png'
 import { testForKillSwitch } from '../../services/dbcursor.js'
 import HasUpdate from "./HasUpdate.jsx"
 import "../assets/main.css"
+import EasterEggs from '../components/EasterEggs.jsx'
 
 
 
@@ -20,6 +19,8 @@ const patchNotesGreen = [
 
 const patchNotesRed = []
 
+let cachedHomeLogin
+
 
 
 
@@ -29,16 +30,16 @@ function Home() {
 	const navigate = useNavigate()
 	
 	const [teste, setTeste] = useState()
-	const [dados, setDados] = useState()
-	const [nome, setNome] = useState()
-	const [ocupacao, setOcupacao] = useState()
-	const [unidade, setUnidade] = useState()
+	const [dados, setDados] = useState(() => cachedHomeLogin?.dados)
+	const [nome, setNome] = useState(() => cachedHomeLogin?.nome)
+	const [ocupacao, setOcupacao] = useState(() => cachedHomeLogin?.ocupacao)
+	const [unidade, setUnidade] = useState(() => cachedHomeLogin?.unidade)
 	const [subModulo, setSubModulo] = useState()
 	const [version, setVersion] = useState()
 	const [hasUpdate, setHasUpdate] = useState(false)
 
 
-	const [FAST_SessionId, setFAST_SessionId] = useState("")
+	const [FAST_SessionId, setFAST_SessionId] = useState(() => cachedHomeLogin?.FAST_SessionId || "")
 	const getDadosLogin = async () => {
 		const response = await window.electron.dadosLogin()
 		const FAST_SessionId = await window.electron.getFastMedicSession()
@@ -53,14 +54,19 @@ function Home() {
 
 			const unidade = response[1].replace("Estabelecimento: ", "")
 
+			cachedHomeLogin = {
+				dados: response,
+				nome: nome.trim(),
+				ocupacao: ocupacao.trim(),
+				unidade: unidade.trim(),
+				FAST_SessionId
+			}
 			setNome(nome.trim())
 			setOcupacao(ocupacao.trim())
 			setUnidade(unidade.trim())
 			console.log("setos ocoorios")
 		} else {
-			setNome("")
-			setOcupacao("")
-			setUnidade("")
+			alert("erro ao pegar os dados do login")
 		}
 	}
 	
@@ -111,6 +117,7 @@ function Home() {
 	const limparCache = async () => {
 		const confirm = await window.electron.limparCache()
 		if (confirm) {
+			cachedHomeLogin = null
         setDados(null)
         setNome("")
         setOcupacao("")
@@ -134,6 +141,7 @@ function Home() {
 			setNome(nome.trim())
 			setOcupacao(ocupacao.trim())
 			setUnidade(unidade.trim())
+			console.log("dados definidos")
 
 		})
 		async function getVersion() {
@@ -143,7 +151,7 @@ function Home() {
 			setHasUpdate(hasUpdate)
 		}
 		getVersion()
-	}, [ocupacao])
+	}, [])
 	
 	
 	
@@ -162,7 +170,6 @@ function Home() {
 			<HomeButton/>
 			
 			<div className="mainmenu flex-center" style={{height: "80%", width: "100%", borderRadius: "0"}}>
-
 
 
 				{dados ? 
@@ -194,19 +201,10 @@ function Home() {
 				<button onClick={() => navigate('/Filas')}>Filas Atendimento</button>
 				{nome?.toLowerCase().includes("celere") && <button className='analyticsBtn' onClick={() => navigate('/Analytics')}>Relatorios</button>}
 
-
 				{/* //EASTER EGGS */}
 				{/* //EASTER EGGS */}
 				{/* //EASTER EGGS */}
-				{
-					nome?.toLowerCase().includes("pedro camara") && 
-					<div style={{color:"white", display:"flex", justifyContent:"center", alignItems:"center", flexDirection:"row", height:"100%", width:"100%"}}>
-						<img src={mel} style={{height:200,width:200}}></img>
-						<p style={{fontSize:"81px"}}>♥</p>
-						<img src={pedro} style={{height:200,width:200}}></img>
-
-					</div>
-				}
+				<EasterEggs nome={nome}/>
 				{/* //EASTER EGGS */}
 				{/* //EASTER EGGS */}
 				{/* //EASTER EGGS */}

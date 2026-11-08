@@ -26,8 +26,8 @@ const HorarioAgenda = memo(function HorarioAgenda({
     return (
         <motion.div
             className="horarioBlock"
-            initial={{ opacity: 0, y: 80 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: 80 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.3 }}
         >
             <div className="horarioHeader">
@@ -79,7 +79,7 @@ const HorarioAgenda = memo(function HorarioAgenda({
                         horario.seqAgenda
                     )}
                 >
-                    <Trash2 size={18} />
+                    <Trash2 size={50} />
                 </button>
             </div>
 
@@ -127,7 +127,7 @@ export default function ConsultarAgendas() {
     const [dadosFormatados, setDadosFormatados] = useState({})
     const [nomeArquivoPdf, setNomeArquivoPdf] = useState("")
     const [profissionaisDuplicados, setProfissionaisDuplicados] = useState([])
-    const [repostaCadastro, setRepostaCadastro] = useState("")
+    const [respostaCadastro, setRespostaCadastro] = useState("")
     const bloqueioRef = useRef(null)
     const deletarRef = useRef(null)
     const agendarRef = useRef(null)
@@ -611,57 +611,45 @@ export default function ConsultarAgendas() {
     return (
         <div className='container flex-center' style={{flexDirection: "column", justifyContent: "flex-start", paddingTop: 80}}>
 
-        <HomeButton />
+            <HomeButton />
 
-        {profissionaisDuplicados.length > 0 && (
-            <div className="selecaoProfissionalOverlay">
-                <section
-                    className="selecaoProfissionalModal"
-                    role="dialog"
-                    aria-modal="true"
-                    aria-labelledby="titulo-selecao-profissional"
-                >
-                    <h2 id="titulo-selecao-profissional">Escolha o profissional</h2>
-                    <p>Há mais de uma agenda para este nome. Selecione a opção correta:</p>
-                    <div className="selecaoProfissionalOpcoes">
-                        {profissionaisDuplicados.map((profissional, index) => {
-                            const [id, tipo, cbo] = profissional.value.split(",")
-                            return (
-                                <button
-                                    key={`${profissional.value}-${index}`}
-                                    type="button"
-                                    className="selecaoProfissionalOpcao"
-                                    onClick={() => resolverEscolhaProfissional(profissional)}
-                                >
-                                    <span>{profissional.texto}</span>
-                                    <small>ID: {id} | Agenda: {tipo} | CBO: {cbo}</small>
-                                </button>
-                            )
-                        })}
-                    </div>
-                    <button
-                        type="button"
-                        className="selecaoProfissionalCancelar"
-                        onClick={() => resolverEscolhaProfissional(null)}
+            {profissionaisDuplicados.length > 0 && (
+                <div className="selecaoProfissionalOverlay">
+                    <section
+                        className="selecaoProfissionalModal"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="titulo-selecao-profissional"
                     >
-                        Cancelar importação
-                    </button>
-                </section>
-            </div>
-        )}
-                            <p>{repostaCadastro}</p>
-        {Object.entries(errosAgendamento).map(([seqAgenda, documento]) => {
-            const horario = horarios?.find(
-                h => String(h.seqAgenda) === String(seqAgenda)
-            )
-            
-            return (
-                
-                <li key={seqAgenda} style={{minWidth:400, backgroundColor:"transparent", margin:5, display:"flex", justifyContent:"space-between"}}>
-                    {horario?.hora} — CNS: {documento} <div onClick={() => setRepostaCadastro(cadastroControler.CadastrarUsuarioCNS(documento))} style={{cursor:"pointer", backgroundColor:"green", padding:5}}>Tentar Cadastrar</div>
-                </li>
-            )
-        })}
+                        <h2 id="titulo-selecao-profissional">Escolha o profissional</h2>
+                        <p>Há mais de uma agenda para este nome. Selecione a opção correta:</p>
+                        <div className="selecaoProfissionalOpcoes">
+                            {profissionaisDuplicados.map((profissional, index) => {
+                                const [id, tipo, cbo] = profissional.value.split(",")
+                                return (
+                                    <button
+                                        key={`${profissional.value}-${index}`}
+                                        type="button"
+                                        className="selecaoProfissionalOpcao"
+                                        onClick={() => resolverEscolhaProfissional(profissional)}
+                                    >
+                                        <span>{profissional.texto}</span>
+                                        <small>ID: {id} | Agenda: {tipo} | CBO: {cbo}</small>
+                                    </button>
+                                )
+                            })}
+                        </div>
+                        <button
+                            type="button"
+                            className="selecaoProfissionalCancelar"
+                            onClick={() => resolverEscolhaProfissional(null)}
+                        >
+                            Cancelar importação
+                        </button>
+                    </section>
+                </div>
+            )}
+
         
 
         <div className='configs flex-center' style={{}}> 
@@ -749,31 +737,56 @@ export default function ConsultarAgendas() {
             {/* <button onClick={() => getUserIDByCNS(704503385992918)}>Testar get userID pelo cns</button> */}
         </div>
 
-        {/* -------------------------------------------------- */}
-    
-        <div className="horariosContainer">
-            <p >Horarios: </p>
-        {horarios &&
-            horarios.map((horario) => (
-                <HorarioAgenda
-                    key={horario.seqAgenda}
-                    horario={horario}
-                    cns={cnsParaAgendar[horario.seqAgenda] || ""}
-                    isInputAtivo={inputAtivo === horario.seqAgenda}
-                    opcoesBloqueio={opcoesBloqueio}
-                    setInputAtivo={setInputAtivo}
-                    setCnsParaAgendar={setCnsParaAgendar}
-                    bloqueioRef={bloqueioRef}
-                    deletarRef={deletarRef}
-                    agendarRef={agendarRef}
-                    atualizarRef={atualizarRef}
-                />
-            )) || "Selecione o profissional e a data"}
-                        
 
+
+        {/* ^^ menu superior ^^   |   vv menu inferior vv */}
+
+            <div className="container-inferior-horarios">
             
+                <div className="horariosContainer" style={{}}>
+                    <div className="titulo-horarios">
+                        <p >Horarios: </p>
+                    </div>
+                {horarios &&
+                    horarios.map((horario) => (
+                        <HorarioAgenda
+                            key={horario.seqAgenda}
+                            horario={horario}
+                            cns={cnsParaAgendar[horario.seqAgenda] || ""}
+                            isInputAtivo={inputAtivo === horario.seqAgenda}
+                            opcoesBloqueio={opcoesBloqueio}
+                            setInputAtivo={setInputAtivo}
+                            setCnsParaAgendar={setCnsParaAgendar}
+                            bloqueioRef={bloqueioRef}
+                            deletarRef={deletarRef}
+                            agendarRef={agendarRef}
+                            atualizarRef={atualizarRef}
+                        />
+                    )) || "Selecione o profissional e a data"}
+                </div>
+
+                <div className="erros-agendamento-container">
+                    <div className="titulo-horarios">
+                        <p>Erros:</p>
+                    </div>
+
+                    <p>{respostaCadastro}</p>
+                    {Object.entries(errosAgendamento).map(([seqAgenda, documento]) => {
+                        const horario = horarios?.find(
+                            h => String(h.seqAgenda) === String(seqAgenda)
+                        )
+                        
+                        return (
+                            
+                            <li key={seqAgenda} style={{minWidth:400, backgroundColor:"transparent", margin:5, display:"flex", justifyContent:"space-between"}}>
+                                {horario?.hora} — CNS: {documento} <div onClick={() => setRespostaCadastro(cadastroControler.CadastrarUsuarioCNS(documento))} style={{cursor:"pointer", backgroundColor:"green", padding:5}}>Tentar Cadastrar</div>
+                            </li>
+                        )
+                    })}
+                </div>
+
             </div>
             
-            </div>
+        </div>
         )
     }

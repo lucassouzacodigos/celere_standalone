@@ -347,9 +347,8 @@
 /* Área onde ficam os horários */
 .horariosContainer {
   background-color: #1f1f1f;
-  width: 95%;
+  width: 49.5%;
   border-radius: 10px;
-  max-width: 1100px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(600px, 1fr));
   gap: 10px;
@@ -358,12 +357,41 @@
   align-items: start;
 }
 
+.erros-agendamento-container{
+  background-color: #1f1f1f;
+  width: 49.5%;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 15px;
+  overflow-y: auto;
+  align-items: start;
+}
+
+
+.titulo-horarios{
+  font-weight: bold;
+  width: 100%;
+  height: 35px;
+  display: flex;
+  flex-direction: row;
+  margin:-10px;
+  padding: 15px;
+  align-items: center;
+  border-bottom-color: white;
+  border-bottom-style: solid;
+  border-bottom-width: 0.5px;
+}
+
+
+
 
 /* CARD DE CADA HORÁRIO */
 .horarioBlock {
   position: relative;
   width: auto;
-  min-height: 100px;
+  min-height: 60px;
   height: auto;
 
   display: flex;
@@ -373,11 +401,11 @@
 
   background: #292929;
   border: 1px solid #444;
-  border-left: 5px solid var(--verdeElementos);
+  border-left: 2px solid var(--verdeElementos);
   border-radius: 8px;
 
-  padding: 12px;
-  margin: 7px 0px;
+  padding: 4px;
+  margin: 12px 0px;
 
 
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
@@ -389,8 +417,9 @@
 }
 
 .horarioBlock:hover {
-  background: #303030;
-  transform: translateY(-2px);
+
+  background: #505050;
+  transform: translateY(-20px);
   box-shadow: 0 5px 12px rgba(0, 0, 0, 0.35);
 
 }
@@ -400,8 +429,9 @@
 .horarioHeader {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 5px;
   width: 100%;
+  height: 25px;
 }
 
 
@@ -413,6 +443,7 @@
 
   min-width: 65px;
   width: 65px;
+  height: 25px;
 
   margin: 0;
 
@@ -423,7 +454,7 @@
 
   border-radius: 6px;
 
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
 }
 
@@ -448,8 +479,8 @@
   flex-direction: column;
   gap: 3px;
 
-  margin-top: 10px;
-  padding-top: 8px;
+  margin-top: 5px;
+  padding-top: 4px;
 
   border-top: 1px solid #444;
 }
@@ -480,7 +511,7 @@
 
   min-width: 0;
   max-width: 100%;
-  height: 36px;
+  height: 28px;
 
   padding: 6px 10px;
 
@@ -523,6 +554,16 @@
   background: #666;
 }
 
+
+/* parte de baixo pagian consultar agenda */
+.container-inferior-horarios{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 95%;
+  overflow-y: auto;
+}
+
 .metadados{
   position: absolute;
   top: 0;
@@ -543,10 +584,10 @@
 
 .buttonDelete {
   margin: 0 0 0 auto;
-  padding: 7px;
-  min-width: 36px;
-  width: 36px;
-  height: 36px;
+  padding: 2px;
+  min-width: 10px;
+  width:25px;
+  height:25px;
 
   display: flex;
   justify-content: center;
@@ -882,11 +923,11 @@ button:disabled:hover {
     position: relative;
 
     margin: 0 0 0 auto;
-    padding: 7px;
+    padding: 2px;
 
-    min-width: 36px;
-    width: 36px;
-    height: 36px;
+    min-width: 10px;
+    width: 25px;
+    height: 25px;
 
     display: flex;
     justify-content: center;
