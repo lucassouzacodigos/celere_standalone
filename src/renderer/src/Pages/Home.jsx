@@ -14,7 +14,8 @@ import EasterEggs from '../components/EasterEggs.jsx'
 
 //informações da versao
 const patchNotesGreen = [
-	"Melhorias visuais na pagina Agendar Consultas"
+	"Melhorias visuais na pagina Agendar Consultas",
+	"Agora ao serem resolvidos, os erros saem da lista de erros dinamicamente",
 ]
 
 const patchNotesRed = []
