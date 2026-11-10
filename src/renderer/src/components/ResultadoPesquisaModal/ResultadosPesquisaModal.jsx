@@ -55,8 +55,8 @@ export default function ResultadosPesquisaModal({ busca, agendar, seqAgenda, cod
         setResultadoPesquisa(response)
     }
 
-    const agendamentoIndividual = async (id) => {
-        await agendar(undefined, seqAgenda, codParametroAgenda, id)
+    const agendamentoIndividual = async (usuario) => {
+        await agendar(usuario.NumCartaoSaude, seqAgenda, codParametroAgenda, usuario.CodUsuario)
         refresh()
     }
 
@@ -88,7 +88,7 @@ export default function ResultadosPesquisaModal({ busca, agendar, seqAgenda, cod
                             key={index}
                             type="button"
                             className="linhaResultado"
-                            onClick={() => agendamentoIndividual(user.CodUsuario)}
+                            onClick={() => agendamentoIndividual(user)}
                         >
                             <span className="resultadoResumo">
                                 <span className="resultadoCodigo">#{user.CodUsuario}</span>

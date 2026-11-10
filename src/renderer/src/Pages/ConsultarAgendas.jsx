@@ -274,7 +274,7 @@ export default function ConsultarAgendas() {
 
 
     const salvar = async () => {
-    setErrosAgendamento({})
+        setErrosAgendamento({})
 
     for (const horario of horarios) {
 
@@ -302,6 +302,7 @@ export default function ConsultarAgendas() {
         await sleep(10);
     }
 
+
     await verificarHorariosDoDia()
     console.log(errosAgendamento)
 };
@@ -309,7 +310,7 @@ export default function ConsultarAgendas() {
     const agendarUsuarioPorCPFouCNS = async (documento, seqAgenda, codParametroAgenda, directID) => {
 
 
-        const IDCidadao = await getUserIDByCNS(documento)
+        const IDCidadao = directID ? undefined : await getUserIDByCNS(documento)
         await getDadosLogin()
 
         const dados = {
@@ -348,10 +349,20 @@ export default function ConsultarAgendas() {
         const response = await window.electron.agendarUsuarioPorCPFouCNS(dados)
 
         if (response.sucesso) {
+            setErrosAgendamento((prev) => {
+                const errosAtualizados = { ...prev }
+                delete errosAtualizados[seqAgenda]
+                return errosAtualizados
+            })
             console.log("Agendado com sucesso, Adicionado ao log")
             //log
             const nomeProfissionalDonoDaAgenda = profissionais.find(agenda => agenda.value.split(",")[0] == profissionalId).texto.split(" - ")[0].trim()
             addRegister(dadosFormatados.unidade, dadosFormatados?.nome, nomeProfissionalDonoDaAgenda, "Agendamento", await getNomePorDocumento(documento))
+        } else if (documento) {
+            setErrosAgendamento((prev) => ({
+                ...prev,
+                [seqAgenda]: documento,
+            }))
         }
 
     }
@@ -774,6 +785,8 @@ export default function ConsultarAgendas() {
                 </div>
 
                 <div className="erros-agendamento-container">
+
+
                     <div className="titulo-horarios">
                         <p>Erros:</p>
                     </div>
