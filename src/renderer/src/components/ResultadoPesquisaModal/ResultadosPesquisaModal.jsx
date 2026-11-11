@@ -7,7 +7,7 @@ import { motion } from "motion/react"
 import Spinner from "../Spinner"
 
 
-export default function ResultadosPesquisaModal({ busca, agendar, seqAgenda, codParametroAgenda, refresh }) {
+export default function ResultadosPesquisaModal({ busca, agendar, seqAgenda, codParametroAgenda, refresh, horaAgendado }) {
 
     const [resultadoPesquisa, setResultadoPesquisa] = useState([])
     const FAST_SessionId = useRef("")
@@ -56,7 +56,8 @@ export default function ResultadosPesquisaModal({ busca, agendar, seqAgenda, cod
     }
 
     const agendamentoIndividual = async (usuario) => {
-        await agendar(usuario.NumCartaoSaude, seqAgenda, codParametroAgenda, usuario.CodUsuario)
+        console.log("usuario", usuario)
+        await agendar(usuario.NumCartaoSaude, seqAgenda, codParametroAgenda, usuario.CodUsuario, horaAgendado)
         refresh()
     }
 

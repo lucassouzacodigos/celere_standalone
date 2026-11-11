@@ -4,7 +4,7 @@ import {addDoc, collection, getDocs, getDoc, getCountFromServer, doc, limit, ord
 import db from "./firebase"
 
 
-async function addRegister(unidade, quemAgendou, agendadoPara, tipoAcao, pacienteAgendado) {
+async function addRegister(unidade, quemAgendou, agendadoPara, tipoAcao, pacienteAgendado, horaAgendado) {
     const hora = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     const data = new Date().toLocaleDateString('pt-BR');
 
@@ -16,7 +16,8 @@ async function addRegister(unidade, quemAgendou, agendadoPara, tipoAcao, pacient
         tipoAcao: tipoAcao || '',
         data: data || '',
         hora: hora || '',
-        createdAt: new Date().getTime()
+        createdAt: new Date().getTime(),
+        horaAgendado: horaAgendado || '',
     })
 
     console.log("Document written with ID: ", docRef.id);

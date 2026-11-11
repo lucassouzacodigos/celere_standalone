@@ -60,7 +60,8 @@ const HorarioAgenda = memo(function HorarioAgenda({
                                     onChange={(event) => bloqueioRef.current(
                                         horario.codParametroAgenda,
                                         horario.seqAgenda,
-                                        event.target.value
+                                        event.target.value,
+                                        horario.hora
                                     )}
                                 >
                                     {opcoesBloqueio.map((bloqueio) => (
@@ -100,6 +101,7 @@ const HorarioAgenda = memo(function HorarioAgenda({
                         seqAgenda={horario.seqAgenda}
                         codParametroAgenda={horario.codParametroAgenda}
                         agendar={agendarRef.current}
+                        horaAgendado={horario.hora}
                         refresh={atualizarRef.current}
                     />
                 </AnimatePresence>
@@ -296,7 +298,9 @@ export default function ConsultarAgendas() {
         await agendarUsuarioPorCPFouCNS(
             cns,
             horario.seqAgenda,
-            horario.codParametroAgenda
+            horario.codParametroAgenda,
+            undefined,
+            horario.hora
         );
 
         await sleep(10);
@@ -307,9 +311,9 @@ export default function ConsultarAgendas() {
     console.log(errosAgendamento)
 };
 
-    const agendarUsuarioPorCPFouCNS = async (documento, seqAgenda, codParametroAgenda, directID) => {
+    const agendarUsuarioPorCPFouCNS = async (documento, seqAgenda, codParametroAgenda, directID, horaAgendado) => {
 
-
+        console.log(horaAgendado)
         const IDCidadao = directID ? undefined : await getUserIDByCNS(documento)
         await getDadosLogin()
 
@@ -354,10 +358,19 @@ export default function ConsultarAgendas() {
                 delete errosAtualizados[seqAgenda]
                 return errosAtualizados
             })
+
+
             console.log("Agendado com sucesso, Adicionado ao log")
             //log
             const nomeProfissionalDonoDaAgenda = profissionais.find(agenda => agenda.value.split(",")[0] == profissionalId).texto.split(" - ")[0].trim()
-            addRegister(dadosFormatados.unidade, dadosFormatados?.nome, nomeProfissionalDonoDaAgenda, "Agendamento", await getNomePorDocumento(documento))
+            addRegister(
+                dadosFormatados.unidade,
+                dadosFormatados?.nome, 
+                nomeProfissionalDonoDaAgenda, 
+                "Agendamento", 
+                await getNomePorDocumento(documento),
+                horaAgendado
+            )
         } else if (documento) {
             setErrosAgendamento((prev) => ({
                 ...prev,
@@ -374,13 +387,15 @@ export default function ConsultarAgendas() {
 
         //pega a lista de quem pode ser deletado no dia
         const agendaCompletaParaDeletar = await getListaComHorariosParaDeletar()
-        console.log(agendaCompletaParaDeletar)
+        console.log("agendaCompletaParaDeletar", agendaCompletaParaDeletar)
 
         const objetoToDelete = await agendaCompletaParaDeletar.find(obj => {
             return obj.SeqAgenda == seqAgendaDelete && 
             obj.CodParametroAgenda == codParametroAgenda
         })
-        console.log(objetoToDelete)
+        console.log("obj pra deletar",objetoToDelete)
+
+        const horaDoAgendamento = objetoToDelete.HoraConsulta
         // console.log(agendaCompletaParaDeletar)
 
 
@@ -405,7 +420,20 @@ export default function ConsultarAgendas() {
 
         //log
         const nomeProfissionalDonoDaAgenda = profissionais.find(agenda => agenda.value.split(",")[0] == profissionalId).texto.split(" - ")[0].trim()
-        addRegister(dadosFormatados.unidade, dadosFormatados?.nome, nomeProfissionalDonoDaAgenda, "Cancelamento", await getNomePorDocumento(objetoToDelete.NomUsuario))
+        addRegister(dadosFormatados.unidade, 
+            dadosFormatados?.nome, 
+            nomeProfissionalDonoDaAgenda, 
+            "Cancelamento", 
+            objetoToDelete.NomUsuario, 
+            horaDoAgendamento
+        )
+        console.log(dadosFormatados.unidade, 
+            dadosFormatados?.nome, 
+            nomeProfissionalDonoDaAgenda, 
+            "Cancelamento", 
+            objetoToDelete.NomUsuario, 
+            horaDoAgendamento
+        )
 
         
         await verificarHorariosDoDia()
@@ -523,7 +551,7 @@ export default function ConsultarAgendas() {
     }
 
     //BLOQUEAR ADM UM HORARIO
-    const bloqueioADMUnico = async (codParametroAgenda, seqAgenda, codTipoAgendamento) => {
+    const bloqueioADMUnico = async (codParametroAgenda, seqAgenda, codTipoAgendamento, horaAgendado) => {
         
         const dados =
         [
@@ -536,12 +564,14 @@ export default function ConsultarAgendas() {
         ]
 
         await window.electron.bloqueioADMUnico(dados)
+
+
         //log
         const nomeProfissionalDonoDaAgenda = profissionais.find(agenda => agenda.value.split(",")[0] == profissionalId).texto.split(" - ")[0].trim()
         const bloqueioSelecionado = opcoesBloqueio.find((bloqueio) => (
             String(bloqueio.value) === String(codTipoAgendamento)
         ))
-        addRegister(dadosFormatados.unidade, dadosFormatados?.nome, nomeProfissionalDonoDaAgenda, "Bloqueio", bloqueioSelecionado?.text || String(codTipoAgendamento))
+        addRegister(dadosFormatados.unidade, dadosFormatados?.nome, nomeProfissionalDonoDaAgenda, "Bloqueio", bloqueioSelecionado?.text || String(codTipoAgendamento), horaAgendado)
 
         await verificarHorariosDoDia()
     }

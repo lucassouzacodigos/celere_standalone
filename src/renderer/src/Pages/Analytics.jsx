@@ -75,7 +75,7 @@ export default function Analytics () {
                     ))}
                 </nav>
 
-                <section className="analyticsList" aria-live="polite">
+                <section className="analyticsList" aria-live="polite" >
                     {visibleRegisters.length > 0 ? visibleRegisters.map((item, index) => (
                         <article
                             className="analyticsRow"
@@ -83,36 +83,32 @@ export default function Analytics () {
                             tabIndex="0"
                         >
                             <div className="analyticsRowAccent" />
-                            <div className="analyticsRowSummary">
-                                <div className="analyticsRowDate">
-                                    <strong>{item.hora || "--:--"}</strong>
-                                    <span>{item.data || "Data não informada"}</span>
+                            <dl className="analyticsDetails">
+                                <div className="analyticsField analyticsFieldPrimary">
+                                    <dt>Horário</dt>
+                                    <dd>{item.horaAgendado || "--:--"}</dd>
                                 </div>
-                                <div className="analyticsRowPerson">
-                                    <strong>{item.agendadoPara || "Pessoa não informada"}</strong>
-                                    <span>{selectedMode?.label}</span>
+                                <div className="analyticsField analyticsFieldPrimary">
+                                    <dt>Paciente</dt>
+                                    <dd>{item.pacienteAgendado || "Não informado"}</dd>
                                 </div>
-                                <div className="analyticsRowUnit">
-                                    <span>Unidade   </span>
-                                    <strong>{item.unidade || "Não informada"}</strong>
+                                <div className="analyticsField">
+                                    <dt>Agendado para</dt>
+                                    <dd>{item.agendadoPara || "Não informado"}</dd>
                                 </div>
-                            </div>
-                            <div className="analyticsRowDetails">
-                                <dl className="analyticsDetails">
-                                <div>
+                                <div className="analyticsField">
                                     <dt>Unidade</dt>
                                     <dd>{item.unidade || "Não informada"}</dd>
                                 </div>
-                                <div>
-                                    <dt>Responsável</dt>
+                                <div className="analyticsField">
+                                    <dt>Agendado por</dt>
                                     <dd>{item.quemAgendou || "Não informado"}</dd>
                                 </div>
-                                <div>
-                                    <dt>Paciente agendado</dt>
-                                    <dd>{item.pacienteAgendado || "Não informado"}</dd>
+                                <div className="analyticsField">
+                                    <dt>Em</dt>
+                                    <dd>{[item.data, item.hora].filter(Boolean).join(" · ") || "Data e hora não informadas"}</dd>
                                 </div>
-                                </dl>
-                            </div>
+                            </dl>
                         </article>
                     )) : (
                         <div className="analyticsEmpty">
