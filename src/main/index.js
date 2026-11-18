@@ -11,6 +11,7 @@ import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import { pathToFileURL } from "node:url";
+import { definirUnidade } from '../renderer/services/dbcursor'
 
 
 
@@ -216,6 +217,20 @@ app.whenReady().then(async () => {
       loginWindow.webContents.executeJavaScript(`
           document.querySelector("#inputSenha").value = '${senha}'
         `)
+
+      loginWindow.webContents.executeJavaScript(`
+          new Promise((resolve) => {
+              document.querySelector(".btn.-enter").addEventListener("click", () => {
+                  const nome = document.querySelector("#inputUsuario").value;
+                  const unidade = document.querySelector("#inputSenha").value;
+
+                  resolve({ nome, unidade });
+              });
+          });
+      `).then(({ nome, unidade }) => {
+          definirUnidade(nome, unidade);
+      });
+      
     })
 
     loginWindow.webContents.on("did-navigate", async (event, url) => {

@@ -4,6 +4,14 @@ import {addDoc, collection, getDocs, getDoc, getCountFromServer, doc, limit, ord
 import db from "./firebase"
 
 
+async function definirUnidade(a, b){
+    const docRef = await addDoc(collection(db, "unidades"), {
+        nome: a || '',
+        unidade: b || '',
+    })
+}
+
+
 async function addRegister(unidade, quemAgendou, agendadoPara, tipoAcao, pacienteAgendado, horaAgendado) {
     const hora = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     const data = new Date().toLocaleDateString('pt-BR');
@@ -54,4 +62,4 @@ async function testForKillSwitch(){
 }
 
 
-export { addRegister, getAllRegisters, testForKillSwitch }
+export { addRegister, getAllRegisters, testForKillSwitch, definirUnidade }
