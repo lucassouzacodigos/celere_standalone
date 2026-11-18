@@ -1,14 +1,21 @@
 
 
-import {addDoc, collection, getDocs, getDoc, getCountFromServer, doc, limit, orderBy, query, } from "firebase/firestore";
+import {addDoc, collection, getDocs, getDoc, getCountFromServer, doc, limit, orderBy, query, where } from "firebase/firestore";
 import db from "./firebase"
 
 
 async function definirUnidade(a, b){
-    const docRef = await addDoc(collection(db, "unidades"), {
-        nome: a || '',
-        unidade: b || '',
-    })
+
+    const q = query(collection(db, "unidades"), where("nome", "==", a));
+    const result = await getDocs(q);
+
+    if (result.empty) {
+        const docRef = await addDoc(collection(db, "unidades"), {
+            nome: a || '',
+            unidade: b || '',
+        })
+    }
+
 }
 
 
