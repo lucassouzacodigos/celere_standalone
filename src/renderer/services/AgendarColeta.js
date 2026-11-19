@@ -242,10 +242,10 @@ async function AgendarColetaDeExameGenerico(documento, crmDoutor, dataParaColeta
         // console.log(dados)
 
         const response = await window.electron.AgendarColetaDeExameGenerico(dados)
-        console.log(response.Mensagem)
         //nesse ponto, o exame generico ja deve estar adicionado ao paciente
 
         //entao essa funcao abaixo, pega o pedido do exame e marca o dia da coleta dele
+        //aqui é o FINAL da funcao e do controller, respostaMarcaDiaColeta é o response final da API
         const respostaMarcaDiaColeta = await marcarDiaColetaDoExameGenerico(dadosPaciente.CodUsuario, dataParaColeta, pacienteInseridoProcedimentos.NumAtendimento, pacienteInseridoProcedimentos.CodFces)
 
 
@@ -262,8 +262,7 @@ async function AgendarColetaDeExameGenerico(documento, crmDoutor, dataParaColeta
         //log -- infos que vao para o banco
         dbControler.addRegister(postoColetaLog, quemAgendou, agendadoPara, 'Agendamento coleta', pacienteAgendado)
 
-
-        return response.Mensagem
+        return respostaMarcaDiaColeta
 }
 
 

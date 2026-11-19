@@ -607,7 +607,7 @@ app.whenReady().then(async () => {
           body: JSON.stringify(dados)
         });
         const texto = await resposta.text()
-        console.log(texto)
+        console.log("resposta do marcar-dia-coleta-do-exame-generico", texto)
         return JSON.parse(JSON.parse(texto))
     })
 

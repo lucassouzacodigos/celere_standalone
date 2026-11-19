@@ -2,6 +2,7 @@ import HomeButton from "../components/HomeButton";
 import * as coletasControler from "../../services/AgendarColeta.js"
 import { useEffect, useRef, useState } from "react";
 import "../assets/main.css"
+import ItemEsperandoColeta from "../components/ItemEsperandoColeta.jsx";
 
 
 
@@ -30,15 +31,20 @@ export default function AgendarColeta () {
         setFAST_SessionId(FAST_SessionId)
     }
 
-    const handleAgendamento = async () => {
+    const handleAgendamento = async (directDoc) => {
+
         try {
-            await coletasControler.AgendarColetaDeExameGenerico(documento, conselhoMedico, dataSelecionada)
+            const response = await coletasControler.AgendarColetaDeExameGenerico(directDoc || documento, conselhoMedico, dataSelecionada)
             reloadListaDeColetas()
             setTempErro(false)
+            return response
         } catch (err) {
+            console.log(err)
             console.log("Erro ao agendar paciente")
             setTempErro(true)
         }
+        // console.log("response", response)
+
     }
 
 
@@ -50,12 +56,16 @@ export default function AgendarColeta () {
     }
 
     const importarPdf = async (event) => {
+
+        //ALERTA
+
         const file = event.target.files[0]
         event.target.value = ""
         if (!file) return
 
         setNomeArquivoPdf(file.name)
         setErroPdf("")
+        setListaCnsPdf("")
 
         try {
             const arrayBuffer = await file.arrayBuffer()
@@ -69,7 +79,8 @@ export default function AgendarColeta () {
                 throw new Error("O PDF não retornou texto para leitura.")
             }
 
-            const correspondenciaData = resultado.texto.match(/Data:\s*(\d{2})\/(\d{2})\/(\d{4})/i)
+            const textoPdf = resultado.texto.replace(/\r/g, "")
+            const correspondenciaData = textoPdf.match(/Data:\s*(\d{2})\/(\d{2})\/(\d{4})/i)
             let dataPdf = ""
             if (correspondenciaData) {
                 const [, dia, mes, ano] = correspondenciaData
@@ -83,15 +94,24 @@ export default function AgendarColeta () {
                 }
             }
 
-            const cnsEncontrados = [...resultado.texto.matchAll(/CNS\s*:\s*(\d{15})/gi)]
-                .map((match) => match[1])
-            const cnsUnicos = [...new Set(cnsEncontrados)]
+            const cnsEncontrados = [...textoPdf.matchAll(/(?:^|\n)\s*(\d{2}:\d{2})\s+([^\n]+)[\s\S]*?(?=\n\s*\d{2}:\d{2}\s|$)/g)]
+                .map((bloco) => {
+                    return {
+                        nome: bloco[2].split(/\s+\(/)[0].trim(),
+                        cns: bloco[0].match(/CNS\s*:\s*(\d{15})/i)?.[1] || "Nao informado",
+                    }
+                })
+            const cnsUnicos = cnsEncontrados.filter((paciente, index, pacientes) =>
+                paciente.cns === "Nao informado" ||
+                pacientes.findIndex((item) => item.cns === paciente.cns) === index
+            )
             console.log(cnsUnicos)
 
             if (cnsUnicos.length === 0) {
                 throw new Error("Nenhum CNS foi encontrado no PDF.")
             }
-            setListaCnsPdf(cnsUnicos)
+            cnsUnicos.sort((a, b) => a.nome.localeCompare(b.nome))
+            setListaCnsPdf(cnsUnicos)   
             if (dataPdf) {
                 setDataSelecionada(dataPdf)
             } else {
@@ -123,44 +143,91 @@ export default function AgendarColeta () {
         <div className='container flex-center' style={{flexDirection: "column", justifyContent: "flex-start", paddingTop: 80}}>
             <HomeButton/>
 
-            <div className="configs" style={{minHeight: 350}}>
-
-                <p>Selecionar Data</p>
-                <input className='inputData' type="date" value={dataSelecionada.split("/").reverse().join("-")} onChange={async(e) => {
-                    const data = e.target.value; // yyyy-mm-dd
-                    const [ano, mes, dia] = data.split("-");
-                    const dataFormatada = `${dia}/${mes}/${ano}`
-                    setDataSelecionada(dataFormatada);
-
-                    const listaDeColetas = await coletasControler.getAgendaDeColetasDia(dataFormatada)
-                    setListaDeColetas(listaDeColetas)
-
-                }}
-                ></input>
-
-                <label>
-                    <p>Conselho do Medico Solicitante</p>
-                    <input className='inputData' type="text" placeholder="N° Do conselho solicitante" onChange={(e) => setConselhoMedico(e.target.value)}></input>
-                </label>
+            <div className="configs" style={{minHeight: "auto", display: "flex", flexDirection: "row", justifyContent: "start", alignItems: "start", padding: 10}}>
 
 
-
-
-                <p>Documento do Paciente</p>    
-                <p>Status: {tempErro ? <span style={{fontWeight:"bold", color:"red"}}>CNS Nao encontrado</span> : <span style={{fontWeight:"bold", color:"green"}}>OK</span>}</p>  
-                <input className='inputData' type="text" placeholder="Documento" onChange={(e) => setDocumento(e.target.value)}></input>
-                <button onClick={handleAgendamento}>Agendar coleta de exame genérico</button>
+                {/* botao master */}
+                <button onClick={handleAgendamento}
+                    style={{width: 150, margin:10, height: "85%"}}
+                >Agendar coleta de exame genérico</button>
                 
-                <input
-                    ref={inputPdfRef}
-                    type="file"
-                    accept=".pdf,application/pdf"
-                    onChange={importarPdf}
-                    style={{display: "none"}}
-                />
-                {/* <button type="button" onClick={() => inputPdfRef.current?.click()}>
-                    Importar CNSs de PDF
-                </button> */}
+
+
+                <div className='divisorItemColeta'>
+                    <p >Selecionar Data</p>
+                    <input className='inputData' type="date" value={dataSelecionada.split("/").reverse().join("-")} onChange={async(e) => {
+                        const data = e.target.value; // yyyy-mm-dd
+                        const [ano, mes, dia] = data.split("-");
+                        const dataFormatada = `${dia}/${mes}/${ano}`
+                        setDataSelecionada(dataFormatada);
+                        const listaDeColetas = await coletasControler.getAgendaDeColetasDia(dataFormatada)
+                        setListaDeColetas(listaDeColetas)
+                    }}
+                    ></input>
+                </div>
+
+                <div className='divisorItemColeta'>
+                    <p >Conselho do Medico Solicitante</p>
+                    <input className='inputData' type="text" placeholder="N° Do conselho solicitante" onChange={(e) => setConselhoMedico(e.target.value)}></input>
+                </div>
+
+
+
+
+                <div className='divisorItemColeta'>
+                    <p>Status: {tempErro ? <span style={{fontWeight:"bold", color:"red"}}>CNS Nao encontrado</span> : <span style={{fontWeight:"bold", color:"green"}}>OK</span>}</p>
+                    <p>Documento do Paciente</p>
+                    <input className='inputData' type="text" placeholder="Documento" onChange={(e) => setDocumento(e.target.value)}></input>
+                    
+                    
+                    
+                    <input
+                        ref={inputPdfRef}
+                        type="file"
+                        accept=".pdf,application/pdf"
+                        onChange={importarPdf}
+                        style={{display: "none"}}
+                    />
+
+                    
+
+                </div>
+
+                <div className='divisorItemColeta'>
+                    <button
+                        type="button"
+                        onClick={() => {
+                            const confirmar = window.confirm(`
+!!!IMPORTANTE!!!
+
+Tenha bastante cuidado ao usar essa função.
+Importe seu PDF apenas uma vez.
+
+Toda vez que um PDF é importado, ele solicita automaticamente
+a coleta de material para todos os pacientes encontrados.
+
+Se importar o mesmo PDF novamente, poderá solicitar exames
+duplicados para os mesmos pacientes.
+
+Não precisa selecionar a data, pois ela será extraída do PDF.
+
+CRM atual: ${conselhoMedico === "" ? "*NAO INFORMADO*" : conselhoMedico}
+
+Se ainda não informou o CRM do médico solicitante,
+cancele a seleção do arquivo antes de importar.
+Caso contrário, ele será agendado para o médico com ID 1.
+                            `);
+
+                            if (confirmar) {
+                                inputPdfRef.current?.click();
+                            }
+                        }}
+                    >
+                        Importar CNSs de PDF
+                    </button>
+                </div>
+                
+
             </div> 
 
 
@@ -190,9 +257,18 @@ export default function AgendarColeta () {
 
                 </div>
 
-                {/* <div className="configs flex-center" style={{flexDirection: "column", justifyContent: "flex-start", overflowY: "auto", height: "100%", padding: 10, wdith: "45%", backgroundColor:"green"}}>
-                    
-                </div> */}
+                
+
+                <div className="configs flex-center" style={{flexDirection: "column", justifyContent: "flex-start", overflowY: "auto", height: "100%", padding: 10, wdith: "45%"}}>
+                    {
+                        listaCnsPdf.length == 0 ? "Aguardando Pdf" : 
+                        listaCnsPdf.map((entry, index) => {
+                            return(
+                                <ItemEsperandoColeta key={`${entry.nome}-${entry.cns}-${index}`} nome={entry.nome} cns={entry.cns} agendarColetaGenerica={handleAgendamento} />
+                            )
+                        })
+                    }
+                </div>
 
 
             </div>
