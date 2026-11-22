@@ -5,6 +5,7 @@ import { Ban, CalendarDays, CircleX, FileText } from "lucide-react"
 
 const actionModes = [
     { value: "Agendamento", label: "Agendamentos", icon: CalendarDays },
+    { value: "Agendamento coleta", label: "Agendamentos de coleta", icon: CalendarDays },
     { value: "Bloqueio", label: "Bloqueios", icon: Ban },
     { value: "Cancelamento", label: "Cancelamento", icon: CircleX },
 ]
