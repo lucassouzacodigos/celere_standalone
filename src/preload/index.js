@@ -47,6 +47,7 @@ if (process.contextIsolated) {
     simplePostRequest: (url, dados) => ipcRenderer.invoke('simple-post-request', url, dados),
     imprimirPDFBase64: (base64) => ipcRenderer.invoke('imprimir-pdf-base64', base64),
     hasUpdate: () => ipcRenderer.invoke('has-update'),
+    falar: (texto) => ipcRenderer.invoke("tts:falar", texto)
   }
   window.api = api
 }

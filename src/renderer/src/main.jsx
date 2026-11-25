@@ -11,6 +11,7 @@ import Testandopesquisa from './Pages/Testandopesquisa'
 import Analytics from './Pages/Analytics'
 import AgendarColeta from './Pages/AgendarColeta'
 import Filas from './Pages/Filas'
+import Painel from './Pages/Painel'
 
 
 const router = createHashRouter([
@@ -45,6 +46,10 @@ const router = createHashRouter([
   {
     path: 'eat',
     element: <App />,
+  },
+  {
+    path: 'Painel',
+    element: <Painel />,
   },
 
 ])

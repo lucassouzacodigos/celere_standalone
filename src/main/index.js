@@ -12,6 +12,8 @@ import path from "node:path";
 import os from "node:os";
 import { pathToFileURL } from "node:url";
 import { definirUnidade } from '../renderer/services/dbcursor'
+import { PiperNativeTTS } from 'pipertts'
+import { EdgeTTS } from 'node-edge-tts'
 
 
 
@@ -25,6 +27,7 @@ let dadoslogin
 let mainWindow
 let dadosLoginFormatados
 let hasUpdate = false
+let piperInstance = null
 
 const baseUrl = "https://sistema.saudepublica.digital"
 
@@ -242,7 +245,7 @@ app.whenReady().then(async () => {
 
       
       
-      if (url.includes("/pep") || url.includes("artes/adm")) {
+      if (url.includes("/pep") || url.endsWith("/adm")) {
         
         console.log("fechou")
         setTimeout(async () => {
@@ -854,6 +857,67 @@ app.whenReady().then(async () => {
     // console.log(typeof parsed2)
     return parsed2
   })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  //GERADOR DE VOZ, PAINEL
+
+
+  ipcMain.handle("tts:falar", async (event, texto) => {
+      try {
+          const arquivo = path.join(
+              app.getPath("temp"),
+              `chamada-${Date.now()}.mp3`
+          );
+
+          const tts = new EdgeTTS({
+              voice: "pt-BR-AntonioNeural",
+              lang: "pt-BR"
+          });
+
+          await tts.ttsPromise(texto, arquivo);
+
+          const audioBuffer = fs.readFileSync(arquivo);
+
+          fs.unlinkSync(arquivo);
+
+          return {
+              sucesso: true,
+              audio: audioBuffer
+          };
+
+      } catch (error) {
+          console.error(error);
+
+          return {
+              sucesso: false,
+              erro: error.message
+          };
+      }
+  });
+
     
 
 
